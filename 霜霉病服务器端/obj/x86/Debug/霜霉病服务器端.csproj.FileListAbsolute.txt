@@ -1,0 +1,90 @@
+E:\C workspace\csharp\Server\霜霉病服务器端\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\C workspace\csharp\Server\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+E:\C workspace\csharp\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+E:\C workspace\csharp\Server\霜霉病服务器端\obj\x86\Debug\GenerateResource.read.1.tlog
+E:\C workspace\csharp\Server\霜霉病服务器端\obj\x86\Debug\GenerateResource.write.1.tlog
+E:\C workspace\csharp\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+E:\C workspace\csharp\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+E:\C workspace\csharp\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+E:\C workspace\csharp\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+E:\C workspace\csharp\Server\霜霉病服务器端\bin\Debug\MySql.Data.dll
+E:\C workspace\csharp\Server\霜霉病服务器端\bin\Debug\MySQLDriverCS.dll
+E:\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+E:\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+E:\CSharp_project\success2\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+E:\CSharp_project\success2\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+E:\CSharp_project\success2\Server\霜霉病服务器端\bin\Debug\MySql.Data.dll
+E:\CSharp_project\success2\Server\霜霉病服务器端\bin\Debug\MySQLDriverCS.dll
+E:\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+E:\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+E:\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\GenerateResource.read.1.tlog
+E:\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\GenerateResource.write.1.tlog
+F:\杨宁\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+F:\杨宁\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+F:\杨宁\CSharp_project\success2\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+F:\杨宁\CSharp_project\success2\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+F:\杨宁\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojResolveAssemblyReference.cache
+F:\杨宁\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+F:\杨宁\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+F:\杨宁\CSharp_project\success2\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.GenerateResource.Cache
+F:\杨宁\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+F:\杨宁\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+F:\杨宁\CSharp_project\success4\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+F:\杨宁\CSharp_project\success4\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+F:\杨宁\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojResolveAssemblyReference.cache
+F:\杨宁\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+F:\杨宁\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+F:\杨宁\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.GenerateResource.Cache
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\bin\Debug\MySql.Data.dll
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\bin\Debug\MySQLDriverCS.dll
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojResolveAssemblyReference.cache
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+I:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.GenerateResource.Cache
+F:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+F:\毕业论文\CSharp_project\success4\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+F:\毕业论文\CSharp_project\success5\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+F:\毕业论文\CSharp_project\success5\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+F:\毕业论文\CSharp_project\success5\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+F:\毕业论文\CSharp_project\success5\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+F:\毕业论文\CSharp_project\success5\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojResolveAssemblyReference.cache
+F:\毕业论文\CSharp_project\success5\Server\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+F:\毕业论文\CSharp_project\success5\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+F:\毕业论文\CSharp_project\success5\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.GenerateResource.Cache
+F:\毕业论文\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+F:\毕业论文\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+F:\毕业论文\CSharp_project\success6\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+F:\毕业论文\CSharp_project\success6\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+F:\毕业论文\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojResolveAssemblyReference.cache
+F:\毕业论文\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+F:\毕业论文\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+F:\毕业论文\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.GenerateResource.Cache
+F:\毕业\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+F:\毕业\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+F:\毕业\CSharp_project\success6\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+F:\毕业\CSharp_project\success6\Server\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+F:\毕业\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojResolveAssemblyReference.cache
+F:\毕业\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+F:\毕业\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+F:\毕业\CSharp_project\success6\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.GenerateResource.Cache
+F:\毕业\CSharp_project\success8\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+F:\毕业\CSharp_project\success8\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+F:\毕业\CSharp_project\服务器软件代码\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+F:\毕业\CSharp_project\服务器软件代码\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojAssemblyReference.cache
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+E:\project\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
+E:\project\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+E:\project\霜霉病服务器端\bin\Debug\Newtonsoft.Json.dll
+E:\project\霜霉病服务器端\bin\Debug\Newtonsoft.Json.xml
+E:\project\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.Resources.resources
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.GenerateResource.cache
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.CoreCompileInputs.cache
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.CopyComplete

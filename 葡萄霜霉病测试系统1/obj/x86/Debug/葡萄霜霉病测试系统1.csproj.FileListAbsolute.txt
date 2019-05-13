@@ -1,0 +1,51 @@
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.Properties.Resources.resources
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\GenerateResource.read.1.tlog
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\GenerateResource.write.1.tlog
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.exe
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.pdb
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.exe
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.pdb
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\bin\Debug\MySQLDriverCS.dll
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\GenerateResource.read.2386.tlog
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.Login.resources
+E:\C workspace\csharp\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.葡萄霜霉病防控系统.resources
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.exe
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.pdb
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.exe
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.pdb
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\bin\Debug\MySQLDriverCS.dll
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\ResolveAssemblyReference.cache
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.Login.resources
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.Properties.Resources.resources
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.葡萄霜霉病防控系统.resources
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\GenerateResource.read.1.tlog
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\GenerateResource.read.2386.tlog
+E:\CSharp_project\success2\Server\葡萄霜霉病测试系统1\obj\x86\Debug\GenerateResource.write.1.tlog
+F:\杨宁\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csprojResolveAssemblyReference.cache
+F:\杨宁\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.Login.resources
+F:\杨宁\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.Properties.Resources.resources
+F:\杨宁\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.葡萄霜霉病防控系统.resources
+F:\杨宁\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csproj.GenerateResource.Cache
+F:\杨宁\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.exe
+F:\杨宁\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.pdb
+I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csprojResolveAssemblyReference.cache
+I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.Login.resources
+I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.Properties.Resources.resources
+I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.葡萄霜霉病防控系统.resources
+I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csproj.GenerateResource.Cache
+I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.exe
+I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.pdb
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.Login.resources
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.Properties.Resources.resources
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.葡萄霜霉病防控系统.resources
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csproj.GenerateResource.cache
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csproj.CoreCompileInputs.cache
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.exe
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.pdb
+E:\project\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.exe
+E:\project\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.pdb
+E:\project\葡萄霜霉病测试系统1\bin\Debug\Newtonsoft.Json.dll
+E:\project\葡萄霜霉病测试系统1\bin\Debug\Newtonsoft.Json.xml
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csproj.CopyComplete
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csprojAssemblyReference.cache
