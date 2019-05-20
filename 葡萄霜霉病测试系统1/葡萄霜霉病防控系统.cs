@@ -18,11 +18,21 @@ namespace 葡萄霜霉病防控测试系统1
 {
     public partial class 葡萄霜霉病防控系统 : Form
     {
-        public 葡萄霜霉病防控系统()
+
+		Socket socketClient = Login.ClientSocket;
+		Thread threadClient = null;//创建用于接收服务器端消息的线程
+		string username = Login.username;
+		DateTime DateTime = new System.DateTime();
+		public 葡萄霜霉病防控系统()
         {
             InitializeComponent();
             TextBox.CheckForIllegalCrossThreadCalls = false;
-        }
+			ShowMsg("连接成功");
+			//开启一个新的线程用来接收服务端发来的消息
+			threadClient = new Thread(ReceiveAll);//Receive是demo里的RecMsg
+			threadClient.IsBackground = true;
+			threadClient.Start();
+		}
 
         private void cboYear_SelectedIndexChanged(object sender, EventArgs e)  //日期选择某月
         {
@@ -80,35 +90,25 @@ namespace 葡萄霜霉病防控测试系统1
             }
         } //日期选择某天
 
-        Socket socketClient = null;
-        Thread threadClient = null;//创建用于接收服务器端消息的线程
-        DateTime DateTime = new System.DateTime();
-
-        private void btnStart_Click(object sender, EventArgs e)  //TCP建立连接//demo 的btnConnect
-        {
-            try
-            {
-                //创建负责通信的socket
-                socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-                IPAddress ip = IPAddress.Parse(txtServer.Text);
-                IPEndPoint point = new IPEndPoint(ip, Convert.ToInt32(txtPort.Text));
-                //获得远程连接服务器应用程序的Ip地址和端口号
-                socketClient.Connect(point);
-                ShowMsg("连接成功");
-                //开启一个新的线程用来接收服务端发来的消息
-                threadClient = new Thread(Receive);//Receive是demo里的RecMsg
-                threadClient.IsBackground = true;
-                threadClient.Start();
-            }
-            catch
-            { }
-        }
-
-        void ShowMsg(string str)    //Tcp socket聊天接收框显示数据
-        {
-            //  txtLog.AppendText(str + "\r\n");
-            // textBox2.Text = str;
-        }
+        //private void btnStart_Click(object sender, EventArgs e)  //TCP建立连接//demo 的btnConnect
+        //{
+        //    try
+        //    {
+        //        //创建负责通信的socket
+        //        socketClient = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        //        IPAddress ip = IPAddress.Parse(txtServer.Text);
+        //        IPEndPoint point = new IPEndPoint(ip, Convert.ToInt32(txtPort.Text));
+        //        //获得远程连接服务器应用程序的Ip地址和端口号
+        //        socketClient.Connect(point);
+        //        ShowMsg("连接成功");
+        //        //开启一个新的线程用来接收服务端发来的消息
+        //        threadClient = new Thread(Receive);//Receive是demo里的RecMsg
+        //        threadClient.IsBackground = true;
+        //        threadClient.Start();
+        //    }
+        //    catch
+        //    { }
+        //}
 
         string MyConnectionString = "Server=localhost;Database=testdb;Uid=root;Pwd=123456;";
         MySqlCommand cmd;
@@ -122,22 +122,18 @@ namespace 葡萄霜霉病防控测试系统1
             socketClient.Send(buffer);
         }
 
-        private void LoadData()
-        {
-
-        }
         /// <summary>
         /// 不停接收服务端发来的消息
         ///Receive是demo的RecMsg
         ///
         /// 
-        void Receive()
+        void ReceiveAll()
         {
             while (true)
             {
                 try
                 {
-                    byte[] buffer = new byte[1024 * 1024 * 3];//定义一个3M的缓冲区
+                    byte[] buffer = new byte[1024 * 1024 * 10];//定义一个10M的缓冲区
                     //返回实际接收到的有效字节数    
                     int r = socketClient.Receive(buffer);
                     if (r == 0)
@@ -145,166 +141,69 @@ namespace 葡萄霜霉病防控测试系统1
                         break;
                     }
                     string s = Encoding.UTF8.GetString(buffer, 0, r);
-                    ShowMsg(s);
+                    //ShowMsg(s);
                     if (s.Substring(0,1) == "P")       //表示接收到了大棚采集到的数据 
                     {
-                        switch (s.Substring(2, 1))
-                        {
-                            case "1": if (s.Substring(43, 1) == "1")
-                                {
-                                    textBox2.Text = s.Substring(9, 4);
-                                    textBox3.Text = s.Substring(23, 4);
-                                    textBox4.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "2")
-                                {
-                                    textBox10.Text = s.Substring(9, 4);
-                                    textBox9.Text = s.Substring(23, 4);
-                                    textBox8.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "3")
-                                {
-                                    textBox18.Text = s.Substring(9, 4);
-                                    textBox17.Text = s.Substring(23, 4);
-                                    textBox16.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "4")
-                                {
-                                    textBox14.Text = s.Substring(9, 4);
-                                    textBox13.Text = s.Substring(23, 4);
-                                    textBox12.Text = s.Substring(34, 5);
-                                }
-                                break;
-                            case "2": if (s.Substring(43, 1) == "1")
-                                {
-                                    textBox2.Text = s.Substring(9, 4);
-                                    textBox3.Text = s.Substring(23, 4);
-                                    textBox4.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "2")
-                                {
-                                    textBox10.Text = s.Substring(9, 4);
-                                    textBox9.Text = s.Substring(23, 4);
-                                    textBox8.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "3")
-                                {
-                                    textBox18.Text = s.Substring(9, 4);
-                                    textBox17.Text = s.Substring(23, 4);
-                                    textBox16.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "4")
-                                {
-                                    textBox14.Text = s.Substring(9, 4);
-                                    textBox13.Text = s.Substring(23, 4);
-                                    textBox12.Text = s.Substring(34, 5);
-                                }
-                                break;
-                            case "3": if (s.Substring(43, 1) == "1")
-                                {
-                                    textBox2.Text = s.Substring(9, 4);
-                                    textBox3.Text = s.Substring(23, 4);
-                                    textBox4.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "2")
-                                {
-                                    textBox10.Text = s.Substring(9, 4);
-                                    textBox9.Text = s.Substring(23, 4);
-                                    textBox8.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "3")
-                                {
-                                    textBox18.Text = s.Substring(9, 4);
-                                    textBox17.Text = s.Substring(23, 4);
-                                    textBox16.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "4")
-                                {
-                                    textBox14.Text = s.Substring(9, 4);
-                                    textBox13.Text = s.Substring(23, 4);
-                                    textBox12.Text = s.Substring(34, 5);
-                                }
-                                break;
-                            case "4": if (s.Substring(43, 1) == "1")
-                                {
-                                    textBox2.Text = s.Substring(9, 4);
-                                    textBox3.Text = s.Substring(23, 4);
-                                    textBox4.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "2")
-                                {
-                                    textBox10.Text = s.Substring(9, 4);
-                                    textBox9.Text = s.Substring(23, 4);
-                                    textBox8.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "3")
-                                {
-                                    textBox18.Text = s.Substring(9, 4);
-                                    textBox17.Text = s.Substring(23, 4);
-                                    textBox16.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "4")
-                                {
-                                    textBox14.Text = s.Substring(9, 4);
-                                    textBox13.Text = s.Substring(23, 4);
-                                    textBox12.Text = s.Substring(34, 5);
-                                }
-                                break;
-                            case "5": if (s.Substring(43, 1) == "1")
-                                {
-                                    textBox2.Text = s.Substring(9, 4);
-                                    textBox3.Text = s.Substring(23, 4);
-                                    textBox4.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "2")
-                                {
-                                    textBox10.Text = s.Substring(9, 4);
-                                    textBox9.Text = s.Substring(23, 4);
-                                    textBox8.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "3")
-                                {
-                                    textBox18.Text = s.Substring(9, 4);
-                                    textBox17.Text = s.Substring(23, 4);
-                                    textBox16.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "4")
-                                {
-                                    textBox14.Text = s.Substring(9, 4);
-                                    textBox13.Text = s.Substring(23, 4);
-                                    textBox12.Text = s.Substring(34, 5);
-                                }
-                                break;
-                            case "6": if (s.Substring(43, 1) == "1")
-                                {
-                                    textBox2.Text = s.Substring(9, 4);
-                                    textBox3.Text = s.Substring(23, 4);
-                                    textBox4.Text = s.Substring(34, 5);
-                                }
-                                else if (s.Substring(43, 1) == "2")
-                                {
-                                    textBox10.Text = s.Substring(9, 4);
-                                    textBox9.Text = s.Substring(22, 4);
-                                    textBox8.Text = s.Substring(33, 5);
-                                }
-                                else if (s.Substring(42, 1) == "3")
-                                {
-                                    textBox18.Text = s.Substring(8, 4);
-                                    textBox17.Text = s.Substring(22, 4);
-                                    textBox16.Text = s.Substring(33, 5);
-                                }
-                                else if (s.Substring(42, 1) == "4")
-                                {
-                                    textBox14.Text = s.Substring(8, 4);
-                                    textBox13.Text = s.Substring(22, 4);
-                                    textBox12.Text = s.Substring(33, 5);
-                                }
-                                break;
-                        }
+						int number = Convert.ToInt32(s.Substring(2, 1));
+						if( number >= 1 && number <= 6)
+						{
+							if (s.Substring(43, 1) == "1")
+							{
+								textBox2.Text = s.Substring(9, 4);
+								textBox3.Text = s.Substring(23, 4);
+								textBox4.Text = s.Substring(34, 5);
+							}
+							else if (s.Substring(43, 1) == "2")
+							{
+								textBox10.Text = s.Substring(9, 4);
+								textBox9.Text = s.Substring(23, 4);
+								textBox8.Text = s.Substring(34, 5);
+							}
+							else if (s.Substring(43, 1) == "3")
+							{
+								textBox18.Text = s.Substring(9, 4);
+								textBox17.Text = s.Substring(23, 4);
+								textBox16.Text = s.Substring(34, 5);
+							}
+							else if (s.Substring(43, 1) == "4")
+							{
+								textBox14.Text = s.Substring(9, 4);
+								textBox13.Text = s.Substring(23, 4);
+								textBox12.Text = s.Substring(34, 5);
+							}
+						}
+
                     }
                     else if (s.Substring(0, 1) == "C")
                     {
                     }
+					//收到来自服务器的消息
+					else if(s.Substring(0, 3) == "msg")
+					{
+						 ShowMsg("服务器（" + s.Substring(3, 19) + "）: " + s.Substring(22));
+					}
+					else if(s.Substring(0, 1) == "f")
+					{
+						ShowMsg("服务器传来一个文件。。。怎么办呢？");
+						string fileStr = Encoding.UTF8.GetString(buffer, 1, r - 1);						
+						SaveFileDialog sfDialog = new SaveFileDialog();
+						if (sfDialog.ShowDialog() == DialogResult.OK)
+						{
+							string savePath = sfDialog.FileName;
+							using (FileStream fs = new FileStream(savePath, FileMode.Create, FileAccess.Write))
+							{
+								fs.Write(buffer, 1, r - 1);
+								fs.Flush();
+								fs.Close();
+							}
+							string fName = savePath.Substring(savePath.LastIndexOf("\\") + 1);
+							string fPath = savePath.Substring(0, savePath.LastIndexOf("\\"));
+							ShowMsg(GetCurrentTime() + "您已经成功接收了文件：“" + fName + "”,保存的路径为：“" + fPath + "”");
+
+						}
+						
+
+					}
                     else
                     {
                     }
@@ -400,11 +299,12 @@ namespace 葡萄霜霉病防控测试系统1
 
         private void btnExit_Click(object sender, EventArgs e)  //退出系统
         {
-            //需要获得当前主窗体的对象才能关闭所有  要关掉FORM1 这里声明的FORM1与上面的FORM1不是同一个
-            // this.close();// 关闭了FORM3
-            //借助test.cs的字段_fr1Test 静态对象全局共享 存放原来Form1
-            // test._exitAll.Close();
-            // this.Dispose();
+			//需要获得当前主窗体的对象才能关闭所有  要关掉FORM1 这里声明的FORM1与上面的FORM1不是同一个
+			// this.close();// 关闭了FORM3
+			//借助test.cs的字段_fr1Test 静态对象全局共享 存放原来Form1
+			// test._exitAll.Close();
+			// this.Dispose();
+			this.DialogResult = DialogResult.Cancel;
             Login.ActiveForm.Close();
 
 
@@ -434,23 +334,6 @@ namespace 葡萄霜霉病防控测试系统1
 
         }
 
-        private void groupBox3_Enter(object sender, EventArgs e)
-        {
-
-        }
-
-
-
-        private void dateTimePicker1_ValueChanged(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label10_Click(object sender, EventArgs e)
-        {
-
-        }
-
         private void btnChaXun_Click(object sender, EventArgs e)
         {
             MySqlConnection connection = new MySqlConnection(MyConnectionString);
@@ -469,16 +352,6 @@ namespace 葡萄霜霉病防控测试系统1
             {
 
             }
-        }
-
-        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-
-        }
-
-        private void groupBox1_Enter(object sender, EventArgs e)
-        {
-            //this.BackColor = Color.Transparent;
         }
         /// <summary>
         /// 下传修改参数指令 
@@ -502,22 +375,42 @@ namespace 葡萄霜霉病防控测试系统1
                 txtMsg.Clear();
             }
         }
-
-        
-
-        private void label15_Click(object sender, EventArgs e)
-        {
-
-        }
-
-        private void label16_Click(object sender, EventArgs e)
-        {
-
-        }
-
-      
-        
-    }
+       	//向服务器发送消息
+		private void BtnSendMsg_Click(object sender, EventArgs e)
+		{
+			string strMsg = sendMsgBox.Text.Trim();
+			if(strMsg == "")
+			{
+				MessageBox.Show("发送消息为空，请重新输入！");
+			}
+			else {
+				try
+				{
+					ShowMsg(username + "( " + GetCurrentTime() + "):" + strMsg);
+					byte[] arrMsg = Encoding.UTF8.GetBytes("msg" + GetCurrentTime() + strMsg);
+					socketClient.Send(arrMsg);
+					sendMsgBox.Clear();
+				}
+				catch
+				{
+					RequestTimeOut();
+				}
+			}
+		}
+		//请求服务器超时
+		private void RequestTimeOut()
+		{
+			MessageBox.Show("请求服务器超时！");
+		}
+		private void ShowMsg(string str)
+		{
+			MsgBox.AppendText(str + "\r\n");
+		}
+		private string GetCurrentTime()
+		{
+			return DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
+		}
+	}
 }
 
 

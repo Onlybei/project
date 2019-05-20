@@ -12,16 +12,56 @@ namespace 葡萄霜霉病测试系统1
         /// 应用程序的主入口点。
         /// </summary>
         [STAThread]
+		
         static void Main()
         {
-            //Application.EnableVisualStyles();
-            //Application.SetCompatibleTextRenderingDefault(false);
-            //Application.Run(new Login());
-            Login login = new Login();
-            if (login.ShowDialog() == DialogResult.OK)
-            {
-                Application.Run(new 葡萄霜霉病防控系统());
-            }
+			Register register =  new Register();
+			//Application.EnableVisualStyles();
+			//Application.SetCompatibleTextRenderingDefault(false);
+			//Application.Run(new Login());
+			Login login = new Login();
+			//Application.Run(login);
+			login.ShowDialog();
+			葡萄霜霉病防控系统 pSystem = new 葡萄霜霉病防控系统();
+			while(true)
+			{
+				if (login.DialogResult == DialogResult.OK)
+				{
+					Application.Run(pSystem);
+					login.DialogResult = DialogResult.None;
+					//new 葡萄霜霉病防控系统().ShowDialog();
+				}
+				else if (login.DialogResult == DialogResult.No)
+				{
+					
+					//Application.Run(register);
+					register.ShowDialog();
+					login.DialogResult = DialogResult.None;
+				}
+				//if (register != null)
+				//{
+				//返回登录
+				if (register.DialogResult == DialogResult.Retry)
+				{
+					login.ShowDialog();
+					register.DialogResult = DialogResult.None;
+					//Application.Run(login);
+				}
+				//}
+				if(login.DialogResult == DialogResult.Cancel || pSystem.DialogResult == DialogResult.Cancel)
+				{
+					break;
+				}
+				else{
+					if(register != null) 
+					{
+						if(register.DialogResult == DialogResult.Cancel)
+						{
+							break;
+						}
+					}
+				}
+			}
         }
     }
 }

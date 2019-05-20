@@ -76,11 +76,7 @@ F:\毕业\CSharp_project\success8\Server\霜霉病服务器端\obj\x86\Debug\霜
 F:\毕业\CSharp_project\success8\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
 F:\毕业\CSharp_project\服务器软件代码\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
 F:\毕业\CSharp_project\服务器软件代码\Server\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
-E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojAssemblyReference.cache
-E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
-E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
 E:\project\霜霉病服务器端\bin\Debug\霜霉病服务器端.exe
-E:\project\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
 E:\project\霜霉病服务器端\bin\Debug\Newtonsoft.Json.dll
 E:\project\霜霉病服务器端\bin\Debug\Newtonsoft.Json.xml
 E:\project\霜霉病服务器端\obj\x86\Debug\_19server.Form1.resources
@@ -88,3 +84,7 @@ E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.Properties.
 E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.GenerateResource.cache
 E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.CoreCompileInputs.cache
 E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csproj.CopyComplete
+E:\project\霜霉病服务器端\bin\Debug\霜霉病服务器端.pdb
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.exe
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.pdb
+E:\project\霜霉病服务器端\obj\x86\Debug\霜霉病服务器端.csprojAssemblyReference.cache
