@@ -15,12 +15,17 @@ using System.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections;
 using Newtonsoft.Json;
+using ClientUser;
 
 namespace _19server
 {
 	public partial class Form1 : Form
 	{
-		Socket socketSend;
+		private static readonly string MyConnectionString = "Server=localhost;Database=testdb;Uid=root;Pwd=123456;";
+		private static MySqlConnection connection = new MySqlConnection(MyConnectionString);
+		//private static List<User> onlineUserList = new List<User>();
+		//private static List<User> offlineUserList = new List<User>();
+		private static List<List<User>> userList = new List<List<User>>();
 		//protected override void OnLoad(EventArgs e)
 		//{
 		//    base.OnLoad(e);
@@ -30,8 +35,9 @@ namespace _19server
 		/// <summary>
 		/// 5.29新加的 多线程通信
 		/// </summary>
-		Thread threadwatch = null;//负责监听客户端连接请求的线程
-		Socket socketwatch = null;
+		private Socket socketSend;
+		private Thread threadwatch = null;//负责监听客户端连接请求的线程
+		private Socket socketwatch = null;
 		//将远程连接的客户端的ip地址和Socket以及users存入集合当中
 		Dictionary<string, Socket> dicSocket = new Dictionary<string, Socket>();
 		Dictionary<string, Thread> dicThread = new Dictionary<string, Thread>();
@@ -43,6 +49,9 @@ namespace _19server
 		{
 			InitializeComponent();
 			TextBox.CheckForIllegalCrossThreadCalls = false;
+			//分别为在线和不在线  0 :在线 1:不在线
+			userList.Add(new List<User>());
+			userList.Add(new List<User>());
 		}
 		private void btnStart_Click(object sender, EventArgs e)   //开始监听
 		{
@@ -74,6 +83,66 @@ namespace _19server
 			{
 			}
 
+		}
+		private void InitUserList()
+		{			
+			if (connection.State != ConnectionState.Open)
+			{
+				connection.Open();//连接数据库
+			}
+			MySqlCommand cmd = new MySqlCommand("SELECT * FROM TB_USER");
+			MySqlDataReader reader = cmd.ExecuteReader();
+			
+			//ListViewItem item = new ListViewItem("", listView1.Groups[0]);
+			while (reader.Read())
+			{
+				//不在线用户
+				//0:id
+				//1:user_name
+				//2.user_password
+				//3.user_trueName
+				//4.user_telephone
+				//5.user_company
+				userList[1].Add(new User(reader[1].ToString(), null, null, reader[3].ToString(), reader[4].ToString(), reader[5].ToString(), "offline"));
+			}
+		}
+		private void InitListView()
+		{
+			for (int i = 0 ; i < userList.Count; i++)
+			{
+				for (int j = 0 ; j < userList[i].Count(); j ++)
+				{
+					ListViewItem item;
+					item = new ListViewItem((j + 1).ToString(), lbOnline.Groups[i]);
+					//socket
+					string ip = "";
+					string threadNo = "";
+					if (userList[i][j].socket != null)
+					{
+						ip = userList[i][j].socket.RemoteEndPoint.ToString();
+					}
+					if(userList[i][j].thread != null)
+					{
+						threadNo = userList[i][j].thread.ManagedThreadId.ToString();
+					}
+					item.SubItems[0].Text = j.ToString();
+					item.SubItems[1].Text = userList[i][j].username;
+					item.SubItems[2].Text = ip;
+					item.SubItems[3].Text = threadNo;
+					item.SubItems[4].Text = userList[i][j].trueName;
+					item.SubItems[5].Text = userList[i][j].telephone;
+					item.SubItems[6].Text = userList[i][j].company;
+					lbOnline.Items.Add(item);
+				}
+			}
+		}
+		private bool userOnline()
+		{
+			return true;
+		}
+		private bool userOffLine()
+		{
+			return true;
 		}
 		/// <summary>
 		/// 等待客户端的连接，并且创建与之通信用的socket
@@ -133,8 +202,6 @@ namespace _19server
 		/// <param name="o"></param>
 		void Receive(object o)
 		{
-
-			string MyConnectionString = "Server=localhost;Database=testdb;Uid=root;Pwd=123456;";
 			string Temp;
 			string Humility;
 			int Light;
@@ -182,31 +249,16 @@ namespace _19server
 							{
 								name = ht["name"].ToString();
 								pwd = ht["pwd"].ToString();
+								//pwd = Encoding.ASCII.GetString(Convert.FromBase64String(ht["pwd"].ToString()));
+								//pwd = ht["pwd"].ToString();
 							}
 							if (dicUsers.ContainsValue(name))
 							{
-								foreach(string key in dicUsers.Keys)
-								{
-									//说明该用户已经上线
-									if(dicUsers[key] == name)
-									{
-										//移除下拉框
-										cboUsers.Items.Remove(key);
-										foreach(int i in lbOnline.Items)
-										{
-											if(lbOnline.Items[i].ToString() == name)
-											{
-												//移除listview中的一行
-												lbOnline.Items[i].Remove();
-											}
-										}
-										//移除用户dic，socketdic，线程dic
-										byte[] msg = Encoding.UTF8.GetBytes("msg" + GetCurrentTime() + "您的账号已经在别的设备上登录，本客户端已经下线");
-										dicUsers.Remove(key);
-										dicSocket.Remove(key);
-										dicThread.Remove(key);
-									}
-								}
+								string info = "您的账号已经在别的设备上登录，本客户端已经下线";
+								string delKey = getKeyByUsername(name);
+								HandleUserClose(delKey);
+								byte[] msg = Encoding.UTF8.GetBytes("msg" + GetCurrentTime() + info);
+								dicSocket[delKey].Send(msg);
 							}
 							cmd.CommandText = "select COUNT(*) from tb_user where user_name='" + name + "' and user_password = '" + pwd + "';";
 							count = Convert.ToInt32(cmd.ExecuteScalar());
@@ -441,17 +493,21 @@ namespace _19server
 						break;
 					}
 				}
-				catch (SocketException se)
+				catch
 				{
-
+					string key = socketSend.RemoteEndPoint.ToString();
+					
 					//throw;
 					//从通信套接字集合中删除被中断连接的通信套接字
-					dicSocket.Remove(socketSend.RemoteEndPoint.ToString());
+					//dicSocket.Remove(socketSend.RemoteEndPoint.ToString());
 					//从通信线程集合中删除被中断连接的通信线程对象
-					dicThread.Remove(socketSend.RemoteEndPoint.ToString());
+					//dicThread.Remove(socketSend.RemoteEndPoint.ToString());
+					//dicUsers.Remove(socketSend.RemoteEndPoint.ToString());
 					//从列表中删除被中断的IP
 					// lbOnline.Items.Remove(socketSend.RemoteEndPoint.ToString());
-					ShowMsg("" + socketSend.RemoteEndPoint.ToString() + "断开异常消息\r\n" + se.Message);
+					//ShowMsg("" + socketSend.RemoteEndPoint.ToString() + "断开异常消息\r\n" + se.Message);
+					ShowMsg(dicUsers[key] + "已经下线！");
+					HandleUserClose(socketSend.RemoteEndPoint.ToString());
 					break;
 				}
 
@@ -460,14 +516,12 @@ namespace _19server
 			if (connection.State == ConnectionState.Open)
 			{
 				connection.Close();
-				//LoadData();
 			}
 		}
 		void ShowMsg(string str)
 		{
 			txtLog.AppendText(str + "\r\n");
 		}
-
 
 		private void Form1_Load(object sender, EventArgs e)
 		{
@@ -519,34 +573,33 @@ namespace _19server
 				txtPath.Text = ofd.FileName;
 			}
 			catch
-			{ }
+			{
+				MessageBox.Show("未知错误：选择文件失败！");
+			}
 		}
 		//发送已经选择了的文件
 		private void btnSendFile_Click(object sender, EventArgs e)
 		{
+			//得到文件路径和文件名
 			string path = txtPath.Text;
-			if(path.Trim().Length == 0 )
+			//检查是否选择了客户端
+			if(IsSelectUser())
 			{
-				MessageBox.Show("请选择需要发送的文件！");
-			}
-			try
-			{
-				//获得要发送文件的路径
-				
-				using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+				if (path.Trim().Length == 0)
 				{
-					byte[] buffer = new byte[fs.Length];
-					int fileLength = fs.Read(buffer, 0, buffer.Length);
-					byte[] sendBuffer = new byte[fileLength + 1];
-					sendBuffer[0] = 0x66;
-					Buffer.BlockCopy(buffer, 0, sendBuffer, 1, fileLength);
-					dicSocket[cboUsers.SelectedItem.ToString()].Send(buffer, 0, fileLength + 1, SocketFlags.None);
+					MessageBox.Show("请选择需要发送的文件！");
 				}
-			}
-			catch
-			{
-				MessageBox.Show("发送失败！");
-				return;
+				else
+				{
+					//获得要发送文件的路径
+					using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+					{
+						if(sendFile(fs, cboUsers.SelectedItem.ToString()))
+						{
+							ShowMsg("发送成功");
+						}
+					}
+				}
 			}
 		}
 		/// <summary>
@@ -606,7 +659,8 @@ namespace _19server
 
 		private void btnSend_Click(object sender, EventArgs e)
 		{
-			if(cboUsers.Text != "请选择客户端")
+
+			if (IsSelectUser())
 			{
 				string strMsg = txtMsg.Text.Trim();
 				string strKey = cboUsers.Text;
@@ -625,10 +679,6 @@ namespace _19server
 					}
 				}
 			}
-			else
-			{
-				MessageBox.Show("请选择客户端！");
-			}
 		}
 
 		private void cboUsers_SelectedIndexChanged(object sender, EventArgs e)
@@ -640,8 +690,8 @@ namespace _19server
 		{
 
 		}
-
-		private void BtnSendAllOnline_MouseHover(object sender, EventArgs e)
+		//群发消息按钮的hover效果
+		private void BtnGroupSendMsg_MouseHover(object sender, EventArgs e)
 		{
 			// 创建the ToolTip 
 			ToolTip toolTip1 = new ToolTip();
@@ -651,10 +701,11 @@ namespace _19server
 			toolTip1.ReshowDelay = 500;//指针从一个控件移向另一个控件时，经过多久才会显示下一个提示框
 			toolTip1.ShowAlways = true;//是否显示提示框
 									   //  设置伴随的对象.
-			toolTip1.SetToolTip(btnSendAllOnline, "向所有在线的用户发送消息！");//设置提示按钮和提示内容
+			toolTip1.SetToolTip(btnGroupSendMsg, "向所有在线的用户发送消息！");//设置提示按钮和提示内容
 		}
 
-		private void BtnSendAllOnline_Click(object sender, EventArgs e)
+		//群发消息按钮点击事件
+		private void BtnGroupSendMsg_Click(object sender, EventArgs e)
 		{
 			DialogResult result = MessageBox.Show("确定向当前在线的所有用户发送消息？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 			//选择是
@@ -676,6 +727,7 @@ namespace _19server
 				return;
 			}
 		}
+		//群发消息
 		private void GroupSend(string str)
 		{
 			byte[] arrMsg = Encoding.UTF8.GetBytes(str); //将要发送的字符串转换成Utf-8字节数组; 
@@ -692,32 +744,133 @@ namespace _19server
 				}
 				txtMsg.Clear();
 			}
-
-			// ShowMsg(strMsg);
 		}
-
+		
+		//获取当前的时间
 		private string GetCurrentTime()
 		{
 			return DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
 		}
 
-		/// <summary>
-		/// 群发消息
-		/// </summary>
-		/// <param name="sender"></param>
-		/// <param name="e"></param>
-		//private void btnSendToAll_Click(object sender, EventArgs e)
-		//{
-		//    string strMsg =txtMsg.Text.Trim() + "\r\n";
-		//    byte[] arrMsg = System.Text.Encoding.UTF8.GetBytes(strMsg); //将要发送的字符串转换成Utf-8字节数组; 
-		//    foreach (Socket s in dicSocket.Values)
-		//    {
-		//        s.Send(arrMsg);
-		//    }
-		//    ShowMsg(strMsg);
-		//    txtMsg.Clear();
-		// MessageBox.Show("群发完毕！");
-		//}
+		//检查是否选择了客户端
+		private bool IsSelectUser()
+		{
+			if (cboUsers.Text == "请选择客户端")
+			{
+				MessageBox.Show("请选择客户端");
+				return false;
+			}
+			return true;
+		}
 
+		//发送文件
+		private bool sendFile(FileStream fs, string ip)
+		{
+			string path = txtPath.Text;
+			try
+			{
+				string fileName = path.Substring(path.LastIndexOf("\\"), path.Length - path.LastIndexOf("\\"));
+				ShowMsg(GetCurrentTime() + " 向" + dicUsers[ip] + "发送文件:" + fileName);
+				byte[] fileBuffer = new byte[fs.Length];
+				fs.Read(fileBuffer, 0, fileBuffer.Length);
+				byte[] btFileName = Encoding.UTF8.GetBytes(fileName);
+				//发送的内容为 "f" + 文件名长度 + 文件 + 文件名
+				byte[] sendBuffer = new byte[5 + btFileName.Length + fileBuffer.Length];
+				sendBuffer[0] = 0x66;           //发送文件的标记	"f"
+				byte[] btFileNameLength = new byte[4];
+				btFileNameLength = BitConverter.GetBytes(btFileName.Length);
+				Buffer.BlockCopy(btFileNameLength, 0, sendBuffer, 1, 4);    //文件名长度写进send
+				Buffer.BlockCopy(fileBuffer, 0, sendBuffer, 5, fileBuffer.Length);  //文件写进send
+				Buffer.BlockCopy(btFileName, 0, sendBuffer, 5 + fileBuffer.Length, btFileName.Length);  //文件名写进send
+				fs.Close();
+				//向选择的客户端发送文件
+				dicSocket[ip].Send(sendBuffer, 0, sendBuffer.Length, SocketFlags.None);
+				return true;
+			}
+			catch
+			{
+				MessageBox.Show("文件发送失败，请联系管理员解决！");
+				return false;
+
+			}
+		}
+		//根据用户名查找IP地址，找到了是key，没找到就是""
+		private string getKeyByUsername(string name)
+		{
+			foreach (string key in dicUsers.Keys)
+			{
+				//说明该用户已经上线
+				if (dicUsers[key] == name)
+				{
+					return key;
+				}
+			}
+			return "";
+		}
+		//用户下线处理
+		private void HandleUserClose(string delKey)
+		{
+			if(delKey != "")
+			{
+				if(cboUsers.Text == dicUsers[delKey])
+				{
+					cboUsers.Text = "请选择客户端";
+				}
+				//移除下拉框
+				cboUsers.Items.Remove(delKey);
+				//移除listviw中的东西
+				//for (int i = 0; i < lbOnline.Items[0].SubItemsCount; i++)
+				//{
+
+				//	if (lbOnline.Items[0].SubItems[i].Text == dicUsers[delKey])
+				//	{
+				//		//移除listview中的一行
+				//		lbOnline.Items[0].SubItems.RemoveAt(i);
+				//	}
+				//}
+				//移除用户dic，socketdic，线程dic
+				dicUsers.Remove(delKey);
+				dicSocket.Remove(delKey);
+				dicThread.Remove(delKey);
+			}
+		}
+		//群发文件
+		private void BtnGroupSendFile_Click(object sender, EventArgs e)
+		{
+			if (dicSocket.Count == 0)
+			{
+				MessageBox.Show("当前没有用户在线！");
+			}
+			else
+			{
+				string path = txtPath.Text;
+				if (path.Trim().Length == 0)
+				{
+					MessageBox.Show("请选择需要发送的文件！");
+				}
+				else{
+					using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+					{
+						int flag = 1;
+						foreach (string key in dicSocket.Keys)
+						{
+							if(!sendFile(fs, key))
+							{
+								flag = 0;
+							}
+						}
+						if(flag == 1)
+						{
+							ShowMsg("发送成功！");
+						}
+						else
+						{
+							MessageBox.Show("发送失败！");
+						}
+					}
+				}
+				
+			}
+		}
 	}
 }

@@ -19,6 +19,17 @@ namespace 葡萄霜霉病防控测试系统1
 		{
 			InitializeComponent();
 		}
+		public static Socket ConnectSocket()
+		{
+			if (ClientSocket == null)
+			{
+				IPAddress ip = IPAddress.Parse(IP);
+				ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+				IPEndPoint endPoint = new IPEndPoint(ip, port);
+				ClientSocket.Connect(endPoint);				
+			}
+			return ClientSocket;
+		}
 
 		private void btnLogin_Click(object sender, EventArgs e)
 		{
@@ -26,43 +37,38 @@ namespace 葡萄霜霉病防控测试系统1
 			string pwd = txtPwd.Text;
 			if (name != "" && pwd != "")
 			{
-				if(ClientSocket == null)
-				{
-					IPAddress ip = IPAddress.Parse(IP);
-					ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-					IPEndPoint endPoint = new IPEndPoint(ip, port);
-					try
-					{
-						ClientSocket.Connect(endPoint);
-						Hashtable ht = new Hashtable();
-						ht.Add("name", name);
-						ht.Add("pwd", pwd);
-						string jsonData = JsonConvert.SerializeObject(ht);
-						byte[] userInfo = Encoding.ASCII.GetBytes(jsonData);
-						ClientSocket.Send(userInfo);
+				ConnectSocket();
+				try
+				{						
+					Hashtable ht = new Hashtable();
+					string safePwd = Convert.ToBase64String(Encoding.ASCII.GetBytes(pwd));
+					ht.Add("name", name);
+					ht.Add("pwd", safePwd);
+					string jsonData = JsonConvert.SerializeObject(ht);
+					byte[] userInfo = Encoding.ASCII.GetBytes(jsonData);
+					ClientSocket.Send(userInfo);
 
-						byte[] receive = new byte[256];
-						int realLength = ClientSocket.Receive(receive);
-						string result = Encoding.ASCII.GetString(receive, 0, realLength);
-						if (result == "yes")
-						{
-							username = name;
-							this.DialogResult = DialogResult.OK;
-						}
-						else
-						{
-							MessageBox.Show("用户名或密码错误！");
-							txtName.Clear();
-							txtPwd.Clear();
-						}
-					}
-					catch
+					byte[] receive = new byte[256];
+					int realLength = ClientSocket.Receive(receive);
+					string result = Encoding.ASCII.GetString(receive, 0, realLength);
+					if (result == "yes")
 					{
-						MessageBox.Show("请求服务器超时！");
-						return ;
+						username = name;
+						this.DialogResult = DialogResult.OK;
 					}
-					
+					else
+					{
+						MessageBox.Show("用户名或密码错误！");
+						txtName.Clear();
+						txtPwd.Clear();
+					}
 				}
+				catch
+				{
+					MessageBox.Show("请求服务器超时！");
+					return ;
+				}
+					
 				
 				//String sql = String.Format("select count(8) from Login where username='{0}' and password ='{1}'", name, pwd);
 				//if (name == "ptsmb" && pwd == "ptsmb")

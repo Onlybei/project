@@ -11,8 +11,8 @@ namespace 葡萄霜霉病防控测试系统1
 	public partial class Register : Form
 	{
 		static Socket ClientSocket;
-		static readonly int port = 23456;
-		static readonly string IP = "39.107.95.53";
+		//static readonly int port = 23456;
+		//static readonly string IP = "39.107.95.53";
 		//static readonly string IP = "127.0.0.1";
 		public Register()
 		{
@@ -36,15 +36,17 @@ namespace 葡萄霜霉病防控测试系统1
 			//每一个项目都不能为空
 			if(username != "" && password != "" && telephone != "" && trueName != "" && company != "")
 			{
+				ClientSocket = Login.ConnectSocket();
 				//把数据发送到服务器
 				string resultMessage = "";
-				IPAddress ip = IPAddress.Parse(IP);
-				ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
-				IPEndPoint endPoint = new IPEndPoint(ip, port);
-				ClientSocket.Connect(endPoint);
+				//IPAddress ip = IPAddress.Parse(IP);
+				//ClientSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+				//IPEndPoint endPoint = new IPEndPoint(ip, port);
+				//ClientSocket.Connect(endPoint);
 				Hashtable ht = new Hashtable();
 				ht.Add("username", username);
-				ht.Add("password", password);
+				string safePwd = Convert.ToBase64String(Encoding.ASCII.GetBytes(password));
+				ht.Add("password", safePwd);
 				ht.Add("telephone", telephone);
 				ht.Add("trueName", trueName);
 				ht.Add("company", company);

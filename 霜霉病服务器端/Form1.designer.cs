@@ -28,7 +28,9 @@
 		/// </summary>
 		private void InitializeComponent()
 		{
-			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("客户端");
+			System.Windows.Forms.ListViewGroup listViewGroup1 = new System.Windows.Forms.ListViewGroup("在线", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewGroup listViewGroup2 = new System.Windows.Forms.ListViewGroup("离线", System.Windows.Forms.HorizontalAlignment.Left);
+			System.Windows.Forms.ListViewItem listViewItem1 = new System.Windows.Forms.ListViewItem("1");
 			this.btnStart = new System.Windows.Forms.Button();
 			this.txtPort = new System.Windows.Forms.TextBox();
 			this.txtServer = new System.Windows.Forms.TextBox();
@@ -41,13 +43,21 @@
 			this.cboUsers = new System.Windows.Forms.ComboBox();
 			this.btnSelect = new System.Windows.Forms.Button();
 			this.lbOnline = new System.Windows.Forms.ListView();
-			this.colClient = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
-			this.btnSendToAll = new System.Windows.Forms.Button();
-			this.groupBox1 = new System.Windows.Forms.GroupBox();
-			this.btnSendAllOnline = new System.Windows.Forms.Button();
+			this.id = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.name = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.groupBoxCommunicate = new System.Windows.Forms.GroupBox();
+			this.btnGroupSendFile = new System.Windows.Forms.Button();
+			this.btnGroupSendMsg = new System.Windows.Forms.Button();
 			this.lbOnlineNumber = new System.Windows.Forms.Label();
 			this.lbCurrentOnline = new System.Windows.Forms.Label();
-			this.groupBox1.SuspendLayout();
+			this.groupBoxLog = new System.Windows.Forms.GroupBox();
+			this.ip = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.trueName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.telephone = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.company = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.threadNo = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+			this.groupBoxCommunicate.SuspendLayout();
+			this.groupBoxLog.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// btnStart
@@ -72,7 +82,7 @@
 			// 
 			// txtServer
 			// 
-			this.txtServer.Location = new System.Drawing.Point(93, 29);
+			this.txtServer.Location = new System.Drawing.Point(80, 29);
 			this.txtServer.Name = "txtServer";
 			this.txtServer.Size = new System.Drawing.Size(145, 21);
 			this.txtServer.TabIndex = 2;
@@ -82,16 +92,16 @@
 			// txtLog
 			// 
 			this.txtLog.BackColor = System.Drawing.Color.Lavender;
-			this.txtLog.Location = new System.Drawing.Point(93, 82);
+			this.txtLog.Location = new System.Drawing.Point(8, 20);
 			this.txtLog.Multiline = true;
 			this.txtLog.Name = "txtLog";
-			this.txtLog.Size = new System.Drawing.Size(518, 78);
+			this.txtLog.Size = new System.Drawing.Size(504, 77);
 			this.txtLog.TabIndex = 3;
 			// 
 			// txtMsg
 			// 
 			this.txtMsg.BackColor = System.Drawing.SystemColors.Window;
-			this.txtMsg.Location = new System.Drawing.Point(6, 52);
+			this.txtMsg.Location = new System.Drawing.Point(8, 332);
 			this.txtMsg.Multiline = true;
 			this.txtMsg.Name = "txtMsg";
 			this.txtMsg.Size = new System.Drawing.Size(415, 51);
@@ -99,25 +109,25 @@
 			// 
 			// txtPath
 			// 
-			this.txtPath.Location = new System.Drawing.Point(6, 130);
+			this.txtPath.Location = new System.Drawing.Point(8, 399);
 			this.txtPath.Name = "txtPath";
-			this.txtPath.Size = new System.Drawing.Size(350, 21);
+			this.txtPath.Size = new System.Drawing.Size(336, 21);
 			this.txtPath.TabIndex = 5;
 			// 
 			// btnSendFile
 			// 
-			this.btnSendFile.Location = new System.Drawing.Point(536, 297);
+			this.btnSendFile.Location = new System.Drawing.Point(427, 399);
 			this.btnSendFile.Name = "btnSendFile";
 			this.btnSendFile.Size = new System.Drawing.Size(75, 23);
 			this.btnSendFile.TabIndex = 7;
-			this.btnSendFile.Text = "发送文件";
+			this.btnSendFile.Text = "发送";
 			this.btnSendFile.UseVisualStyleBackColor = true;
 			this.btnSendFile.Click += new System.EventHandler(this.btnSendFile_Click);
 			// 
 			// btnSend
 			// 
 			this.btnSend.BackColor = System.Drawing.SystemColors.ControlLightLight;
-			this.btnSend.Location = new System.Drawing.Point(427, 80);
+			this.btnSend.Location = new System.Drawing.Point(429, 360);
 			this.btnSend.Name = "btnSend";
 			this.btnSend.Size = new System.Drawing.Size(75, 23);
 			this.btnSend.TabIndex = 8;
@@ -127,7 +137,7 @@
 			// 
 			// btnZD
 			// 
-			this.btnZD.Location = new System.Drawing.Point(737, 296);
+			this.btnZD.Location = new System.Drawing.Point(621, 510);
 			this.btnZD.Name = "btnZD";
 			this.btnZD.Size = new System.Drawing.Size(75, 23);
 			this.btnZD.TabIndex = 9;
@@ -138,7 +148,7 @@
 			// cboUsers
 			// 
 			this.cboUsers.FormattingEnabled = true;
-			this.cboUsers.Location = new System.Drawing.Point(6, 20);
+			this.cboUsers.Location = new System.Drawing.Point(621, 454);
 			this.cboUsers.Name = "cboUsers";
 			this.cboUsers.Size = new System.Drawing.Size(197, 20);
 			this.cboUsers.TabIndex = 11;
@@ -147,86 +157,148 @@
 			// 
 			// btnSelect
 			// 
-			this.btnSelect.Location = new System.Drawing.Point(455, 297);
+			this.btnSelect.Location = new System.Drawing.Point(348, 399);
 			this.btnSelect.Name = "btnSelect";
-			this.btnSelect.Size = new System.Drawing.Size(75, 23);
+			this.btnSelect.Size = new System.Drawing.Size(73, 21);
 			this.btnSelect.TabIndex = 12;
-			this.btnSelect.Text = "选择";
+			this.btnSelect.Text = "选择文件";
 			this.btnSelect.UseVisualStyleBackColor = true;
 			this.btnSelect.Click += new System.EventHandler(this.btnSelect_Click);
 			// 
 			// lbOnline
 			// 
+			this.lbOnline.CheckBoxes = true;
 			this.lbOnline.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
-            this.colClient});
+            this.id,
+            this.name,
+            this.ip,
+            this.threadNo,
+            this.trueName,
+            this.telephone,
+            this.company});
+			this.lbOnline.Cursor = System.Windows.Forms.Cursors.Default;
+			listViewGroup1.Header = "在线";
+			listViewGroup1.Name = "online";
+			listViewGroup1.Tag = "online";
+			listViewGroup2.Header = "离线";
+			listViewGroup2.Name = "offline";
+			listViewGroup2.Tag = "offline";
+			this.lbOnline.Groups.AddRange(new System.Windows.Forms.ListViewGroup[] {
+            listViewGroup1,
+            listViewGroup2});
+			listViewItem1.Group = listViewGroup1;
+			listViewItem1.StateImageIndex = 0;
 			this.lbOnline.Items.AddRange(new System.Windows.Forms.ListViewItem[] {
             listViewItem1});
-			this.lbOnline.Location = new System.Drawing.Point(440, 14);
+			this.lbOnline.Location = new System.Drawing.Point(6, 32);
 			this.lbOnline.Name = "lbOnline";
-			this.lbOnline.Size = new System.Drawing.Size(171, 62);
+			this.lbOnline.Size = new System.Drawing.Size(506, 285);
 			this.lbOnline.TabIndex = 13;
 			this.lbOnline.UseCompatibleStateImageBehavior = false;
+			this.lbOnline.View = System.Windows.Forms.View.Details;
 			this.lbOnline.SelectedIndexChanged += new System.EventHandler(this.lbOnline_SelectedIndexChanged);
 			// 
-			// colClient
+			// id
 			// 
-			this.colClient.Text = "Client";
-			this.colClient.Width = 171;
+			this.id.Text = "编号";
+			this.id.Width = 36;
 			// 
-			// btnSendToAll
+			// name
 			// 
-			this.btnSendToAll.Location = new System.Drawing.Point(715, 171);
-			this.btnSendToAll.Name = "btnSendToAll";
-			this.btnSendToAll.Size = new System.Drawing.Size(75, 23);
-			this.btnSendToAll.TabIndex = 14;
-			this.btnSendToAll.Text = "群发消息";
-			this.btnSendToAll.UseVisualStyleBackColor = true;
+			this.name.Text = "姓名";
+			this.name.Width = 42;
 			// 
-			// groupBox1
+			// groupBoxCommunicate
 			// 
-			this.groupBox1.BackColor = System.Drawing.Color.Transparent;
-			this.groupBox1.Controls.Add(this.btnSendAllOnline);
-			this.groupBox1.Controls.Add(this.lbOnlineNumber);
-			this.groupBox1.Controls.Add(this.lbCurrentOnline);
-			this.groupBox1.Controls.Add(this.cboUsers);
-			this.groupBox1.Controls.Add(this.txtMsg);
-			this.groupBox1.Controls.Add(this.txtPath);
-			this.groupBox1.Controls.Add(this.btnSend);
-			this.groupBox1.Location = new System.Drawing.Point(93, 167);
-			this.groupBox1.Name = "groupBox1";
-			this.groupBox1.Size = new System.Drawing.Size(518, 168);
-			this.groupBox1.TabIndex = 15;
-			this.groupBox1.TabStop = false;
-			this.groupBox1.Text = "客户端通信";
+			this.groupBoxCommunicate.BackColor = System.Drawing.Color.Transparent;
+			this.groupBoxCommunicate.Controls.Add(this.btnSelect);
+			this.groupBoxCommunicate.Controls.Add(this.btnSendFile);
+			this.groupBoxCommunicate.Controls.Add(this.lbOnline);
+			this.groupBoxCommunicate.Controls.Add(this.lbOnlineNumber);
+			this.groupBoxCommunicate.Controls.Add(this.lbCurrentOnline);
+			this.groupBoxCommunicate.Controls.Add(this.txtMsg);
+			this.groupBoxCommunicate.Controls.Add(this.txtPath);
+			this.groupBoxCommunicate.Controls.Add(this.btnSend);
+			this.groupBoxCommunicate.Location = new System.Drawing.Point(80, 168);
+			this.groupBoxCommunicate.Name = "groupBoxCommunicate";
+			this.groupBoxCommunicate.Size = new System.Drawing.Size(518, 438);
+			this.groupBoxCommunicate.TabIndex = 15;
+			this.groupBoxCommunicate.TabStop = false;
+			this.groupBoxCommunicate.Text = "客户端通信";
 			// 
-			// btnSendAllOnline
+			// btnGroupSendFile
 			// 
-			this.btnSendAllOnline.Location = new System.Drawing.Point(362, 17);
-			this.btnSendAllOnline.Name = "btnSendAllOnline";
-			this.btnSendAllOnline.Size = new System.Drawing.Size(75, 23);
-			this.btnSendAllOnline.TabIndex = 14;
-			this.btnSendAllOnline.Text = "群发消息";
-			this.btnSendAllOnline.UseVisualStyleBackColor = true;
-			this.btnSendAllOnline.Click += new System.EventHandler(this.BtnSendAllOnline_Click);
-			this.btnSendAllOnline.MouseHover += new System.EventHandler(this.BtnSendAllOnline_MouseHover);
+			this.btnGroupSendFile.Location = new System.Drawing.Point(621, 557);
+			this.btnGroupSendFile.Name = "btnGroupSendFile";
+			this.btnGroupSendFile.Size = new System.Drawing.Size(75, 23);
+			this.btnGroupSendFile.TabIndex = 15;
+			this.btnGroupSendFile.Text = "群发文件";
+			this.btnGroupSendFile.UseVisualStyleBackColor = true;
+			this.btnGroupSendFile.Click += new System.EventHandler(this.BtnGroupSendFile_Click);
+			// 
+			// btnGroupSendMsg
+			// 
+			this.btnGroupSendMsg.Location = new System.Drawing.Point(621, 480);
+			this.btnGroupSendMsg.Name = "btnGroupSendMsg";
+			this.btnGroupSendMsg.Size = new System.Drawing.Size(75, 23);
+			this.btnGroupSendMsg.TabIndex = 14;
+			this.btnGroupSendMsg.Text = "群发消息";
+			this.btnGroupSendMsg.UseVisualStyleBackColor = true;
+			this.btnGroupSendMsg.Click += new System.EventHandler(this.BtnGroupSendMsg_Click);
+			this.btnGroupSendMsg.MouseHover += new System.EventHandler(this.BtnGroupSendMsg_MouseHover);
 			// 
 			// lbOnlineNumber
 			// 
 			this.lbOnlineNumber.AutoSize = true;
-			this.lbOnlineNumber.Location = new System.Drawing.Point(315, 23);
+			this.lbOnlineNumber.Location = new System.Drawing.Point(101, 17);
 			this.lbOnlineNumber.Name = "lbOnlineNumber";
 			this.lbOnlineNumber.Size = new System.Drawing.Size(11, 12);
 			this.lbOnlineNumber.TabIndex = 13;
-			this.lbOnlineNumber.Text = "1";
+			this.lbOnlineNumber.Text = "0";
 			// 
 			// lbCurrentOnline
 			// 
 			this.lbCurrentOnline.AutoSize = true;
-			this.lbCurrentOnline.Location = new System.Drawing.Point(228, 23);
+			this.lbCurrentOnline.Location = new System.Drawing.Point(6, 17);
 			this.lbCurrentOnline.Name = "lbCurrentOnline";
 			this.lbCurrentOnline.Size = new System.Drawing.Size(89, 12);
 			this.lbCurrentOnline.TabIndex = 12;
 			this.lbCurrentOnline.Text = "当前在线人数：";
+			// 
+			// groupBoxLog
+			// 
+			this.groupBoxLog.Controls.Add(this.txtLog);
+			this.groupBoxLog.Location = new System.Drawing.Point(80, 58);
+			this.groupBoxLog.Name = "groupBoxLog";
+			this.groupBoxLog.Size = new System.Drawing.Size(518, 103);
+			this.groupBoxLog.TabIndex = 16;
+			this.groupBoxLog.TabStop = false;
+			this.groupBoxLog.Text = "系统日志";
+			// 
+			// ip
+			// 
+			this.ip.Text = "ip地址";
+			this.ip.Width = 79;
+			// 
+			// trueName
+			// 
+			this.trueName.Text = "真实姓名";
+			this.trueName.Width = 81;
+			// 
+			// telephone
+			// 
+			this.telephone.Text = "手机号";
+			this.telephone.Width = 87;
+			// 
+			// company
+			// 
+			this.company.Text = "工作单位";
+			this.company.Width = 116;
+			// 
+			// threadNo
+			// 
+			this.threadNo.Text = "线程号";
+			this.threadNo.Width = 50;
 			// 
 			// Form1
 			// 
@@ -235,23 +307,24 @@
 			this.AutoValidate = System.Windows.Forms.AutoValidate.EnableAllowFocusChange;
 			this.BackColor = System.Drawing.SystemColors.ButtonHighlight;
 			this.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
-			this.ClientSize = new System.Drawing.Size(711, 438);
-			this.Controls.Add(this.btnSendToAll);
-			this.Controls.Add(this.lbOnline);
-			this.Controls.Add(this.btnSelect);
+			this.ClientSize = new System.Drawing.Size(684, 618);
 			this.Controls.Add(this.btnZD);
-			this.Controls.Add(this.btnSendFile);
-			this.Controls.Add(this.txtLog);
+			this.Controls.Add(this.cboUsers);
 			this.Controls.Add(this.txtServer);
 			this.Controls.Add(this.txtPort);
 			this.Controls.Add(this.btnStart);
-			this.Controls.Add(this.groupBox1);
+			this.Controls.Add(this.groupBoxCommunicate);
+			this.Controls.Add(this.groupBoxLog);
+			this.Controls.Add(this.btnGroupSendFile);
+			this.Controls.Add(this.btnGroupSendMsg);
 			this.Name = "Form1";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "葡萄霜霉病防控系统服务端";
 			this.Load += new System.EventHandler(this.Form1_Load);
-			this.groupBox1.ResumeLayout(false);
-			this.groupBox1.PerformLayout();
+			this.groupBoxCommunicate.ResumeLayout(false);
+			this.groupBoxCommunicate.PerformLayout();
+			this.groupBoxLog.ResumeLayout(false);
+			this.groupBoxLog.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -271,12 +344,19 @@
 		private System.Windows.Forms.ComboBox cboUsers;
 		private System.Windows.Forms.Button btnSelect;
 		private System.Windows.Forms.ListView lbOnline;
-		private System.Windows.Forms.Button btnSendToAll;
-		private System.Windows.Forms.GroupBox groupBox1;
-		private System.Windows.Forms.ColumnHeader colClient;
+		private System.Windows.Forms.GroupBox groupBoxCommunicate;
+		private System.Windows.Forms.ColumnHeader id;
 		private System.Windows.Forms.Label lbCurrentOnline;
-		private System.Windows.Forms.Button btnSendAllOnline;
+		private System.Windows.Forms.Button btnGroupSendMsg;
 		private System.Windows.Forms.Label lbOnlineNumber;
+		private System.Windows.Forms.Button btnGroupSendFile;
+		private System.Windows.Forms.ColumnHeader name;
+		private System.Windows.Forms.GroupBox groupBoxLog;
+		private System.Windows.Forms.ColumnHeader ip;
+		private System.Windows.Forms.ColumnHeader threadNo;
+		private System.Windows.Forms.ColumnHeader trueName;
+		private System.Windows.Forms.ColumnHeader telephone;
+		private System.Windows.Forms.ColumnHeader company;
 	}
 }
 

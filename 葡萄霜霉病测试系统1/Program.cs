@@ -8,60 +8,53 @@ namespace 葡萄霜霉病测试系统1
 {
     static class Program
     {
-        /// <summary>
-        /// 应用程序的主入口点。
-        /// </summary>
-        [STAThread]
-		
-        static void Main()
-        {
-			Register register =  new Register();
-			//Application.EnableVisualStyles();
-			//Application.SetCompatibleTextRenderingDefault(false);
+		/// <summary>
+		/// 应用程序的主入口点。
+		/// </summary>
+		[STAThread]
+
+		static void Main()
+		{
+			Application.EnableVisualStyles();
+			Application.SetCompatibleTextRenderingDefault(false);
 			//Application.Run(new Login());
 			Login login = new Login();
-			//Application.Run(login);
 			login.ShowDialog();
-			葡萄霜霉病防控系统 pSystem = new 葡萄霜霉病防控系统();
-			while(true)
+			while (true)
 			{
-				if (login.DialogResult == DialogResult.OK)
+				if (login.DialogResult == DialogResult.Cancel)
 				{
-					Application.Run(pSystem);
-					login.DialogResult = DialogResult.None;
-					//new 葡萄霜霉病防控系统().ShowDialog();
+					return;
 				}
-				else if (login.DialogResult == DialogResult.No)
+				//注册
+				if (login.DialogResult == DialogResult.No)
 				{
-					
-					//Application.Run(register);
+					Register register = new Register();
 					register.ShowDialog();
 					login.DialogResult = DialogResult.None;
-				}
-				//if (register != null)
-				//{
-				//返回登录
-				if (register.DialogResult == DialogResult.Retry)
-				{
-					login.ShowDialog();
-					register.DialogResult = DialogResult.None;
-					//Application.Run(login);
-				}
-				//}
-				if(login.DialogResult == DialogResult.Cancel || pSystem.DialogResult == DialogResult.Cancel)
-				{
-					break;
-				}
-				else{
-					if(register != null) 
+					//返回登录
+					if (register.DialogResult == DialogResult.Retry)
 					{
-						if(register.DialogResult == DialogResult.Cancel)
-						{
-							break;
-						}
+						login.ShowDialog();
+						register.DialogResult = DialogResult.None;
+					}
+					else if(register.DialogResult == DialogResult.Cancel)
+					{
+						return;
+					}
+				}
+				//登录成功
+				else
+				{
+					if (login.DialogResult == DialogResult.OK)
+					{
+						break;
 					}
 				}
 			}
-        }
+			葡萄霜霉病防控系统 pSystem = new 葡萄霜霉病防控系统();
+			pSystem.ShowDialog();
+			//Application.Run(pSystem);
+		}			
     }
 }
