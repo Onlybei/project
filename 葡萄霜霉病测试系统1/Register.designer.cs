@@ -114,6 +114,7 @@
 			this.Controls.Add(this.txtPassword);
 			this.Controls.Add(this.txtUsername);
 			this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+			this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
 			this.Name = "Register";
 			this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
 			this.Text = "注册";

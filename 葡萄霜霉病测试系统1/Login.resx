@@ -2129,6 +2129,30 @@
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>307, 260</value>
   </data>
+  <data name="$this.Icon" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+    <value>
+        AAABAAEAEBAAAAEAIABoBAAAFgAAACgAAAAQAAAAIAAAAAEAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAD//////////////////////v////7+/v/+/v7//v7+//7+/v/+/v7//v7+////////////////////
+        /////////////////////////v7+//v8/f/G2N7/vtPa/73T2v+909r/vNTa/9Hh5f/9/v3//v7+////
+        /////////////////////////v7+/9/p7P+2zNX/wdPZ/7/P1f/O3eH/tMnP/9Pj5f/H3eP/vdzl/+/1
+        9//+/v7//////////////////v7+/+Dp7P+/0df/qr/G/7fN1P+vydP/9Pf4//X5+/+42uT/x+Dn/7/b
+        4P+83eb/8fX3//7+/////////v7+//z9/f+zydH/qr7F/7bP2P8/g4f/NnU3/2CZk/9hnZX/QYJS/2zD
+        z/+83OX/xtzg/7fS2v/+/v7////////+/v/H2N7/0t7i/8TV2v9ChYH/OHoM/0GMev9Cjm7/U6WS/1Wl
+        lf81bhn/Yay1/8TY3P/J3eL/5uzv///////+/v//uc3V//7+/v+fwtD/OoMh/z2NDv9Dk1r/TJxw/1Sq
+        hP9TpXr/NnEG/zt7P/+xztf/+/39/7vR1//+/v7//v7+/7rP1//+/v7/fa2x/z2UAv87mwP/Vq+i/06q
+        aP9VtX//Vaec/zl+Av81cQj/jbfD//3+/v+7z9f//v7+//7+/v+6z9f//v7+/4a1tP87oAT/O6ow/0+4
+        jf9bwaf/VLGe/0iZaf87hgX/N3gE/5a7xP/8/v7/us7W//7+/v/+/v7/uc/W//X5+v+mzNb/OKM6/zW4
+        av9b0NT/QbqP/z6lWv9Gmon/PIwF/zqAI/+70Nb/7fP0/8LU2v/+/v7//v7+/93q7f+syND/t9Pa/269
+        qv8nv33/Hcql/z23rf8/onL/OaAY/z6SBP9xo4n/t8zT/5Wzvf/2+Pj///////7//v/+/v7/udXd/9fs
+        8f+53uX/d8m8/yPAj/8uuIP/N6dO/zudFv98sIn/rMTM/9zm6P/A0tn//v7+/////////////v/+//j8
+        /f+63+f/6/T1/6XG0P++19z/j7u1/5S+sf/N3N//krC6/+vx8/+yytL//f7+/////v//////////////
+        /////v7/+v39/8Le5f+20tr/0t/j/9Lf4/+3zNP/1eDj/6vDzf/E19z//v7+//7//v//////////////
+        //////////////7//v/+/v7/9Pn6/8jc4v+/09v/vtPb/83d5P/6/Pz//v7+//7+////////////////
+        //////////////////////////////7//v/+//7//v/+/////v/+/v7//v7/////////////////////
+        ////////AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+        AAAAAAAAAAAAAA==
+</value>
+  </data>
   <data name="$this.StartPosition" type="System.Windows.Forms.FormStartPosition, System.Windows.Forms">
     <value>CenterScreen</value>
   </data>

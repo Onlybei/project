@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
-using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
@@ -11,44 +9,32 @@ using System.Net;
 using System.Threading;
 using MySQLDriverCS;
 using System.IO;
-using System.Configuration;
 using MySql.Data.MySqlClient;
 using System.Collections;
 using Newtonsoft.Json;
 using ClientUser;
+using System.Reflection;
 
 namespace _19server
 {
 	public partial class Form1 : Form
 	{
-		private static readonly string MyConnectionString = "Server=localhost;Database=testdb;Uid=root;Pwd=123456;";
-		private static MySqlConnection connection = new MySqlConnection(MyConnectionString);
-		//private static List<User> onlineUserList = new List<User>();
-		//private static List<User> offlineUserList = new List<User>();
+		private static readonly string MyConnectionString = "Server=localhost;Database=testdb;Uid=root;Pwd=123456;Allow User Variables = True";
 		private static List<List<User>> userList = new List<List<User>>();
-		//protected override void OnLoad(EventArgs e)
-		//{
-		//    base.OnLoad(e);
-		//    btnSend.PerformClick();
-		//}
-
 		/// <summary>
 		/// 5.29新加的 多线程通信
 		/// </summary>
+		/// 
 		private Socket socketSend;
 		private Thread threadwatch = null;//负责监听客户端连接请求的线程
 		private Socket socketwatch = null;
 		//将远程连接的客户端的ip地址和Socket以及users存入集合当中
-		Dictionary<string, Socket> dicSocket = new Dictionary<string, Socket>();
 		Dictionary<string, Thread> dicThread = new Dictionary<string, Thread>();
-		Dictionary<string, string> dicUsers = new Dictionary<string, string>();
-		static int OnlineNumber = 0;
 
 		/*初始化form*/
 		public Form1()
 		{
 			InitializeComponent();
-			TextBox.CheckForIllegalCrossThreadCalls = false;
 			//分别为在线和不在线  0 :在线 1:不在线
 			userList.Add(new List<User>());
 			userList.Add(new List<User>());
@@ -76,7 +62,9 @@ namespace _19server
 									   //创建负责监听的线程
 				threadwatch = new Thread(Listen);//threadWatch =  new  Thread（WatchConnecting）; 
 				threadwatch.IsBackground = true;
-				threadwatch.Start();//();;
+				threadwatch.Start();
+				InitUserList();		//初始化用户列表
+				InitListView();		//初始化listview
 				ShowMsg("监听成功");
 			}
 			catch
@@ -85,35 +73,36 @@ namespace _19server
 
 		}
 		private void InitUserList()
-		{			
-			if (connection.State != ConnectionState.Open)
+		{
+			using (MySqlConnection connection = new MySqlConnection(MyConnectionString))
 			{
 				connection.Open();//连接数据库
-			}
-			MySqlCommand cmd = new MySqlCommand("SELECT * FROM TB_USER");
-			MySqlDataReader reader = cmd.ExecuteReader();
-			
-			//ListViewItem item = new ListViewItem("", listView1.Groups[0]);
-			while (reader.Read())
-			{
-				//不在线用户
-				//0:id
-				//1:user_name
-				//2.user_password
-				//3.user_trueName
-				//4.user_telephone
-				//5.user_company
-				userList[1].Add(new User(reader[1].ToString(), null, null, reader[3].ToString(), reader[4].ToString(), reader[5].ToString(), "offline"));
+				MySqlCommand cmd = connection.CreateCommand();
+				cmd.CommandText = "SELECT * FROM TB_USER ORDER BY USER_ID";
+				MySqlDataReader reader = cmd.ExecuteReader();
+
+				//ListViewItem item = new ListViewItem("", listView1.Groups[0]);
+				while (reader.Read())
+				{
+					//不在线用户
+					//0:id
+					//1:user_name
+					//2.user_password
+					//3.user_trueName
+					//4.user_telephone
+					//5.user_company
+					userList[1].Add(new User(reader[1].ToString(), null, null, reader[3].ToString(), reader[4].ToString(), reader[5].ToString()));
+				}
 			}
 		}
 		private void InitListView()
 		{
+			lbOnline.Items.Clear();
 			for (int i = 0 ; i < userList.Count; i++)
 			{
 				for (int j = 0 ; j < userList[i].Count(); j ++)
 				{
-					ListViewItem item;
-					item = new ListViewItem((j + 1).ToString(), lbOnline.Groups[i]);
+					ListViewItem item = new ListViewItem((j + 1).ToString(), lbOnline.Groups[i]);
 					//socket
 					string ip = "";
 					string threadNo = "";
@@ -125,42 +114,72 @@ namespace _19server
 					{
 						threadNo = userList[i][j].thread.ManagedThreadId.ToString();
 					}
-					item.SubItems[0].Text = j.ToString();
-					item.SubItems[1].Text = userList[i][j].username;
-					item.SubItems[2].Text = ip;
-					item.SubItems[3].Text = threadNo;
-					item.SubItems[4].Text = userList[i][j].trueName;
-					item.SubItems[5].Text = userList[i][j].telephone;
-					item.SubItems[6].Text = userList[i][j].company;
+					//分别添加用户名、ip、线程号码、真实姓名、电话、公司
+					item.SubItems.Add(userList[i][j].username);
+					item.SubItems.Add(ip);
+					item.SubItems.Add(threadNo);
+					item.SubItems.Add(userList[i][j].trueName);
+					item.SubItems.Add(userList[i][j].telephone);
+					item.SubItems.Add(userList[i][j].company);
 					lbOnline.Items.Add(item);
 				}
 			}
+			lbOnlineNumber.Text = userList[0].Count.ToString();
 		}
-		private bool userOnline()
+		//通过反射实现深拷贝
+		public static T DeepClone<T>(T obj)
 		{
-			return true;
+			//如果是字符串或值类型则直接返回
+			if (obj is string || obj.GetType().IsValueType) return obj;
+			object retval = Activator.CreateInstance(obj.GetType());
+			FieldInfo[] fields = obj.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance | BindingFlags.Static);
+			foreach (FieldInfo field in fields)
+			{
+				try { field.SetValue(retval, DeepClone(field.GetValue(obj))); }
+				catch { }
+			}
+			return (T)retval;
+			//return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(t));
 		}
-		private bool userOffLine()
+		private void userOnline(string username, Socket socket)
 		{
-			return true;
+			//当前在离线列表的user index
+			int offlineIndex = FindUserIndexByUserName(userList[1], username);
+			User user = FindUserByUsername(userList[1], username);	//找到这个user
+			user.socket = socket;			//复制当前的的socket
+			user.thread = dicThread[socket.RemoteEndPoint.ToString()];		//记录thread
+			userList[1].RemoveAt(offlineIndex);			//离线列表删除
+			userList[0].Add(user);                      //在线列表增加
+			ShowMsg(username + "已经上线");
+			userList[0] = userList[0].OrderBy(u => u.username).ToList();
+			InitListView();								//初始化列表
+		}
+		private void userOffLine(string username)
+		{
+			//获取需要下线目前是在线的index
+			int targetIndex = FindUserIndexByUserName(userList[0], username);
+			string ip = userList[0][targetIndex].socket.RemoteEndPoint.ToString();
+			//复制这个user
+			//User user = DeepClone<User>(userList[0][targetIndex]);
+			User user = FindUserByUsername(userList[0], username);
+			user.socket = null;     //socket置空
+			user.thread = null;
+			userList[0].RemoveAt(targetIndex);
+			userList[1].Add(user);
+			ShowMsg(username + "已经下线");
+			userList[1] = userList[1].OrderBy(u => u.username).ToList();
+			InitListView();
+			Thread tempTd = dicThread[ip];
+			dicThread.Remove(ip);
+			tempTd.Abort();              //线程终止
 		}
 		/// <summary>
 		/// 等待客户端的连接，并且创建与之通信用的socket
 		/// //监听客户端请求的方法：watchconnecting 本代码是listen
 		/// 
-		private void BtnStart_KeyPress(object sender, KeyPressEventArgs e)
-		{
-			if (e.KeyChar == 13)
-			{
-				btnStart.Focus();
-				btnStart.PerformClick();
-			}
-		}
-		
 
 		void Listen()//void Listen(object o)
 		{
-			// Socket socketWatch = o as Socket;
 			//等待客户端的连接，并且创建一个负责通信的socket
 			while (true)
 			{
@@ -168,12 +187,6 @@ namespace _19server
 				{
 					//负责跟客户端通信的socket  
 					socketSend = socketwatch.Accept();
-					////将远程连接的客户端的IP地址和socket存入集合中
-					//dicSocket.Add(socketSend.RemoteEndPoint.ToString(), socketSend);
-					////将远程连接的客户端的Ip地址和端口号存入下拉框中
-					//cboUsers.Items.Add(socketSend.RemoteEndPoint.ToString());//控件里有连接的ip信息
-					////向列表控件中添加客户端的IP信息;  
-					//lbOnline.Items.Add(socketSend.RemoteEndPoint.ToString());
 					ShowMsg(socketSend.RemoteEndPoint.ToString() + ":" + "连接成功");
 					////开启一个新线程，不停接收客户端发过来的消息
 					Thread th = new Thread(Receive);//Receive在demo里是RecMsg
@@ -181,11 +194,6 @@ namespace _19server
 					th.Start(socketSend);
 					//将与客户端连接的套接字对象添加到集合中;  
 					dicThread.Add(socketSend.RemoteEndPoint.ToString(), th);
-					
-					/////////////////////////////////////////////////////////新加////////////////////////////////
-					//将新建的线程添加到线程的集合中去
-
-					//  MessageBox.Show("!2333");   
 				}
 				catch
 				{
@@ -202,12 +210,6 @@ namespace _19server
 		/// <param name="o"></param>
 		void Receive(object o)
 		{
-			string Temp;
-			string Humility;
-			int Light;
-			int Id;
-			DateTime DateTime = new DateTime();
-
 			MySqlConnection connection = new MySqlConnection(MyConnectionString);
 			MySqlCommand cmd;
 			connection.Open();//连接数据库
@@ -217,305 +219,248 @@ namespace _19server
 				Socket socketSend = o as Socket;
 				try
 				{
-					//客户端连接成功后，服务器应该接收客户端发来的消息  2M的缓存区
-					byte[] buffer = new byte[1024 * 1024 * 2];
+					//客户端连接成功后，服务器应该接收客户端发来的消息 3M的缓存区
+					byte[] buffer = new byte[1024 * 1024 * 3];
 					//实际接收的有效字节数
 					int r = socketSend.Receive(buffer);
 					string currentKey = socketSend.RemoteEndPoint.ToString();
-					string currentClientIP = ((IPEndPoint)socketSend.RemoteEndPoint).Address.ToString();
-					//如果用户下线则跳出循环
-					if (r == 0)
-					{
-						break;
-					}
+					//string currentClientIP = ((IPEndPoint)socketSend.RemoteEndPoint).Address.ToString();
 					string str = Encoding.UTF8.GetString(buffer, 0, r);
-					//ShowMsg(currentClientIP + ":" + str);
-					if (str.Substring(0, 1) == "R")
-					{
-					}
 					//对象json化第一个字符为"{"
-					if (str.Substring(0, 1) == "{")
+					if (str.Substring(0, 1) == "L")
+					{
+						//登录
+						cmd = connection.CreateCommand();
+						string result = "no";
+						int count = -1;
+						string name = "";
+						string pwd = "";
+						Hashtable ht = JsonConvert.DeserializeObject<Hashtable>(str.Substring(1));
+						if (ht.Contains("name") && ht.Contains("pwd"))
+						{
+							name = ht["name"].ToString();
+							pwd = ht["pwd"].ToString();
+							//pwd = Encoding.ASCII.GetString(Convert.FromBase64String(ht["pwd"].ToString()));
+							//pwd = ht["pwd"].ToString();
+						}
+						cmd.CommandText = "select COUNT(*) from tb_user where user_name='" + name + "'	and user_password = '" + pwd + "';";
+						if(connection.State != ConnectionState.Open)
+						{
+							connection.Open();
+						}
+						count = Convert.ToInt32(cmd.ExecuteScalar());
+						//账号密码正确
+						if (count > 0)
+						{
+							User tempUser = FindUserByUsername(userList[0], name);
+							if (tempUser != null)
+							{
+								byte[] msg = Encoding.UTF8.GetBytes("O" + GetCurrentTime() + "您的账号已经在别的设备上登录，本客户端已经下线");
+								tempUser.socket.Send(msg);
+								userOffLine(name);
+
+							}
+							userOnline(name, socketSend);
+							ShowMsg(name + "登录成功！");
+							result = "yes";
+							byte[] send = Encoding.UTF8.GetBytes(result);
+							socketSend.Send(send);
+							CheckOfflineMessage(name);
+							CheckOfflineFile(name);
+						}
+						else
+						{
+							result = "no";
+							byte[] send = Encoding.UTF8.GetBytes(result);
+							socketSend.Send(send);
+						}
+
+						//注册
+					}
+					else if (str.Substring(0, 1) == "R")
 					{
 						cmd = connection.CreateCommand();
-						//登录
-						if (str.Substring(2, 1) == "p")
+						string result = "no";
+						int count = -1;
+						Hashtable ht = JsonConvert.DeserializeObject<Hashtable>(str.Substring(1));
+						if (ht.Contains("username") && ht.Contains("password") && ht.Contains("telephone") && ht.Contains("trueName") && ht.Contains("company"))
 						{
-							string result = "no";
-							int count = -1;
-							string name = "";
-							string pwd = "";
-							Hashtable ht = JsonConvert.DeserializeObject<Hashtable>(str);
-							if (ht.Contains("name") && ht.Contains("pwd"))
-							{
-								name = ht["name"].ToString();
-								pwd = ht["pwd"].ToString();
-								//pwd = Encoding.ASCII.GetString(Convert.FromBase64String(ht["pwd"].ToString()));
-								//pwd = ht["pwd"].ToString();
-							}
-							if (dicUsers.ContainsValue(name))
-							{
-								string info = "您的账号已经在别的设备上登录，本客户端已经下线";
-								string delKey = getKeyByUsername(name);
-								HandleUserClose(delKey);
-								byte[] msg = Encoding.UTF8.GetBytes("msg" + GetCurrentTime() + info);
-								dicSocket[delKey].Send(msg);
-							}
-							cmd.CommandText = "select COUNT(*) from tb_user where user_name='" + name + "' and user_password = '" + pwd + "';";
+							//先查询是否有用户名、真实姓名、手机号相同的情况
+							//用户名查重
+							cmd.CommandText = "SELECT COUNT(*) FROM TB_USER WHERE User_Name='" + ht["username"].ToString() + "';";
 							count = Convert.ToInt32(cmd.ExecuteScalar());
 							if (count > 0)
 							{
-								//将远程连接的客户端的IP地址和socket存入集合中
-								dicSocket.Add(socketSend.RemoteEndPoint.ToString(), socketSend);
-								dicUsers.Add(socketSend.RemoteEndPoint.ToString(), name);
-
-								cboUsers.Items.Add(socketSend.RemoteEndPoint.ToString());//将远程连接的客户端的Ip地址和端口号存入下拉框中				
-								lbOnline.Items.Add(socketSend.RemoteEndPoint.ToString());//向列表控件中添加客户端的IP信息;							 
-								OnlineNumber++;//在线人数+1
-								lbOnlineNumber.Text = OnlineNumber.ToString(); ;
-								result = "yes";								
-								ShowMsg(ht["name"].ToString() + "登录成功！");
+								result = "username";
+							}
+							else
+							{
+								//真实姓名查重
+								cmd.CommandText = "SELECT COUNT(*) FROM TB_USER WHERE User_TrueName='" + ht["trueName"].ToString() + "';";
+								count = Convert.ToInt32(cmd.ExecuteScalar());
+								if (count > 0)
+								{
+									result = "trueName";
+								}
+								else
+								{
+									//手机号码查重
+									cmd.CommandText = "SELECT COUNT(*) FROM TB_USER WHERE  User_Telephone='" + ht["telephone"].ToString() + "';";
+									count = Convert.ToInt32(cmd.ExecuteScalar());
+									if (count > 0)
+									{
+										result = "telephone";
+									}
+									else
+									{
+										//如果数据库没有记录，将新纪录插入到数据库中
+										cmd.CommandText = "INSERT INTO tb_user(User_Name, User_Password, User_TrueName, User_Telephone, User_Company)VALUES(@username, @password, @trueName, @telephone, @company);";
+										cmd.Parameters.AddWithValue("@username", ht["username"].ToString());
+										cmd.Parameters.AddWithValue("@password", ht["password"].ToString());
+										cmd.Parameters.AddWithValue("@trueName", ht["trueName"].ToString());
+										cmd.Parameters.AddWithValue("@telephone", ht["telephone"].ToString());
+										cmd.Parameters.AddWithValue("@company", ht["company"].ToString());
+										if(connection.State != ConnectionState.Open)
+										{
+											connection.Open();
+										}
+										if (cmd.ExecuteNonQuery() > 0)
+										{
+											result = "yes";
+											ShowMsg(ht["username"].ToString() + "注册成功！");
+											
+										}
+									}
+								}
 							}
 							byte[] send = Encoding.UTF8.GetBytes(result);
 							socketSend.Send(send);
 						}
-						//注册
-						else if (str.Substring(2, 1) == "u")
-						{
-							string result = "no";
-							int count = -1;
-							Hashtable ht = JsonConvert.DeserializeObject<Hashtable>(str);
-							if (ht.Contains("username") && ht.Contains("password") && ht.Contains("telephone") && ht.Contains("trueName") && ht.Contains("company"))
-							{
-								//先查询是否有用户名、真实姓名、手机号相同的情况
-								//用户名查重
-								cmd.CommandText = "SELECT COUNT(*) FROM TB_USER WHERE User_Name='" + ht["username"].ToString() + "';";
-								count = Convert.ToInt32(cmd.ExecuteScalar());
-								if (count > 0)
-								{
-									result = "username";
-								}
-								else
-								{
-									//真实姓名查重
-									cmd.CommandText = "SELECT COUNT(*) FROM TB_USER WHERE User_TrueName='" + ht["trueName"].ToString() + "';";
-									count = Convert.ToInt32(cmd.ExecuteScalar());
-									if (count > 0)
-									{
-										result = "trueName";
-									}
-									else
-									{
-										//手机号码查重
-										cmd.CommandText = "SELECT COUNT(*) FROM TB_USER WHERE  User_Telephone='" + ht["telephone"].ToString() + "';";
-										count = Convert.ToInt32(cmd.ExecuteScalar());
-										if (count > 0)
-										{
-											result = "telephone";
-										}
-										else
-										{
-											//如果数据库没有记录，将新纪录插入到数据库中
-											cmd.CommandText = "INSERT INTO tb_user(User_Name, User_Password, User_TrueName, User_Telephone, User_Company)VALUES(@username, @password, @trueName, @telephone, @company);";
-											cmd.Parameters.AddWithValue("@username", ht["username"].ToString());
-											cmd.Parameters.AddWithValue("@password", ht["password"].ToString());
-											cmd.Parameters.AddWithValue("@trueName", ht["trueName"].ToString());
-											cmd.Parameters.AddWithValue("@telephone", ht["telephone"].ToString());
-											cmd.Parameters.AddWithValue("@company", ht["company"].ToString());
-											if (cmd.ExecuteNonQuery() > 0)
-											{
-												result = "yes";
-												ShowMsg(ht["username"].ToString() + "注册成功！");
-											}
-										}
-									}
-								}								
-								byte[] send = Encoding.UTF8.GetBytes(result);
-								socketSend.Send(send);
-							}
-						}
 					}
 					//接收来自客户端的消息
-					else if(str.Substring(0, 3) == "msg")
+					else if(str.Substring(0, 1) == "m")
 					{
-						ShowMsg(dicUsers[currentKey].ToString() + "(" + str.Substring(3, 19) + "):" + str.Substring(22));
-						//ShowMsg(currentClientIP + "(" + str.Substring(3, 22) + "):" + str.Substring(22));
-						//ShowMsg( str.Substring(3));
+						User user = FindUserByIP(userList[0], currentKey);
+						//如果没有找到，那么有可能是别的客户端，不是本地的客户端，那么过滤即可。
+						if(user != null)
+						{
+							ShowMsg(user.username + "(" + str.Substring(1, 19) + "):" + str.Substring(20));
+						}
 					}
 					else if (str.Substring(0, 1) == "P") //收到了大棚采集到的数据
 					{
 						int HouseNumber = Convert.ToInt32(str.Substring(2, 1));
 						if(HouseNumber >= 1 && HouseNumber <= 6)
 						{
-							Temp = str.Substring(9, 4);
-							Humility = str.Substring(23, 4);
-							Light = Convert.ToInt32(str.Substring(34, 5));
-							Id = Convert.ToInt32(str.Substring(43, 2));
-							cmd = connection.CreateCommand();
-							cmd.CommandText = "INSERT INTO System_" + str.Substring(2, 1) + "(Id,Temp,Humility,Light,DateTime,Time)VALUES(@Id,@Temp,@Humility,@Light,@DateTime,@Time)";
-							cmd.Parameters.AddWithValue("@Id", Id);
-							cmd.Parameters.AddWithValue("@Humility", Humility);
-							cmd.Parameters.AddWithValue("@Light", Light);
-							cmd.Parameters.AddWithValue("@Temp", Temp);
-							cmd.Parameters.AddWithValue("@DateTime", DateTime.Now);
-							cmd.Parameters.AddWithValue("@Time", DateTime.Now.ToShortDateString());
-							cmd.ExecuteNonQuery();
-						}
-						else if(HouseNumber == 100)
-						{
-							//if (str.Substring(2, 1) == "1")
-							//{
-							//	//  ShowMsg(socketSend.RemoteEndPoint + ":" + str);
-							//	Temp = str.Substring(9, 4);
-							//	Humility = str.Substring(23, 4);
-							//	Light = Convert.ToInt32(str.Substring(34, 5));
-							//	Id = Convert.ToInt32(str.Substring(43, 2));
-							//	cmd = connection.CreateCommand();
-							//	cmd.CommandText = "INSERT INTO System_1(Id,Temp,Humility,Light,DateTime,Time)VALUES(@Id,@Temp,@Humility,@Light,@DateTime,@Time)";
-							//	cmd.Parameters.AddWithValue("@Id", Id);
-							//	cmd.Parameters.AddWithValue("@Humility", Humility);
-							//	cmd.Parameters.AddWithValue("@Light", Light);
-							//	cmd.Parameters.AddWithValue("@Temp", Temp);
-							//	cmd.Parameters.AddWithValue("@DateTime", DateTime.Now);
-							//	cmd.Parameters.AddWithValue("@Time", DateTime.Now.ToShortDateString());
-							//	cmd.ExecuteNonQuery();
-							//	//string strMsg = txtMsg.Text;
-							//}
-							//else if (str.Substring(2, 1) == "2")
-							//{
-							//	Temp = str.Substring(9, 4);
-							//	Humility = str.Substring(23, 4);
-							//	Light = Convert.ToInt32(str.Substring(34, 5));
-							//	Id = Convert.ToInt32(str.Substring(43, 2));
-							//	cmd = connection.CreateCommand();
-							//	cmd.CommandText = "INSERT INTO System_2(Id,Temp,Humility,Light,DateTime,Time)VALUES(@Id,@Temp,@Humility,@Light,@DateTime,@Time)";
-							//	cmd.Parameters.AddWithValue("@Id", Id);
-							//	cmd.Parameters.AddWithValue("@Humility", Humility);
-							//	cmd.Parameters.AddWithValue("@Light", Light);
-							//	cmd.Parameters.AddWithValue("@Temp", Temp);
-							//	cmd.Parameters.AddWithValue("@DateTime", DateTime.Now);
-							//	cmd.Parameters.AddWithValue("@Time", DateTime.Now.ToShortDateString());
-							//	cmd.ExecuteNonQuery();
-							//}
-							//else if (str.Substring(2, 1) == "3")
-							//{
-							//	Temp = str.Substring(9, 4);
-							//	Humility = str.Substring(23, 4);
-							//	Light = Convert.ToInt32(str.Substring(34, 5));
-							//	Id = Convert.ToInt32(str.Substring(43, 2));
-							//	cmd = connection.CreateCommand();
-							//	cmd.CommandText = "INSERT INTO System_3(Id,Temp,Humility,Light,DateTime,Time)VALUES(@Id,@Temp,@Humility,@Light,@DateTime,@Time)";
-							//	cmd.Parameters.AddWithValue("@Id", Id);
-							//	cmd.Parameters.AddWithValue("@Humility", Humility);
-							//	cmd.Parameters.AddWithValue("@Light", Light);
-							//	cmd.Parameters.AddWithValue("@Temp", Temp);
-							//	cmd.Parameters.AddWithValue("@DateTime", DateTime.Now);
-							//	cmd.Parameters.AddWithValue("@Time", DateTime.Now.ToShortDateString());
-							//	cmd.ExecuteNonQuery();
-							//}
-							//else if (str.Substring(2, 1) == "4")
-							//{
-							//	Temp = str.Substring(9, 4);
-							//	Humility = str.Substring(23, 4);
-							//	Light = Convert.ToInt32(str.Substring(34, 5));
-							//	Id = Convert.ToInt32(str.Substring(43, 2));
-							//	cmd = connection.CreateCommand();
-							//	cmd.CommandText = "INSERT INTO System_4(Id,Temp,Humility,Light,DateTime,Time)VALUES(@Id,@Temp,@Humility,@Light,@DateTime,@Time)";
-							//	cmd.Parameters.AddWithValue("@Id", Id);
-							//	cmd.Parameters.AddWithValue("@Humility", Humility);
-							//	cmd.Parameters.AddWithValue("@Light", Light);
-							//	cmd.Parameters.AddWithValue("@Temp", Temp);
-							//	cmd.Parameters.AddWithValue("@DateTime", DateTime.Now);
-							//	cmd.Parameters.AddWithValue("@Time", DateTime.Now.ToShortDateString());
-							//	cmd.ExecuteNonQuery();
-							//}
-							//else if (str.Substring(2, 1) == "5")
-							//{
-							//	Temp = str.Substring(9, 4);
-							//	Humility = str.Substring(23, 4);
-							//	Light = Convert.ToInt32(str.Substring(34, 5));
-							//	Id = Convert.ToInt32(str.Substring(43, 2));
-							//	cmd = connection.CreateCommand();
-							//	cmd.CommandText = "INSERT INTO System_5(Id,Temp,Humility,Light,DateTime,Time)VALUES(@Id,@Temp,@Humility,@Light,@DateTime,@Time)";
-							//	cmd.Parameters.AddWithValue("@Id", Id);
-							//	cmd.Parameters.AddWithValue("@Humility", Humility);
-							//	cmd.Parameters.AddWithValue("@Light", Light);
-							//	cmd.Parameters.AddWithValue("@Temp", Temp);
-							//	cmd.Parameters.AddWithValue("@DateTime", DateTime.Now);
-							//	cmd.Parameters.AddWithValue("@Time", DateTime.Now.ToShortDateString());
-							//	cmd.ExecuteNonQuery();
-							//}
-							//else if (str.Substring(2, 1) == "6")
-							//{
-							//	Temp = str.Substring(9, 4);
-							//	Humility = str.Substring(23, 4);
-							//	Light = Convert.ToInt32(str.Substring(34, 5));
-							//	Id = Convert.ToInt32(str.Substring(43, 2));
-							//	cmd = connection.CreateCommand();
-							//	cmd.CommandText = "INSERT INTO System_6(Id,Temp,Humility,Light,DateTime,Time)VALUES(@Id,@Temp,@Humility,@Light,@DateTime,@Time)";
-							//	cmd.Parameters.AddWithValue("@Id", Id);
-							//	cmd.Parameters.AddWithValue("@Humility", Humility);
-							//	cmd.Parameters.AddWithValue("@Light", Light);
-							//	cmd.Parameters.AddWithValue("@Temp", Temp);
-							//	cmd.Parameters.AddWithValue("@DateTime", DateTime.Now);
-							//	cmd.Parameters.AddWithValue("@Time", DateTime.Now.ToShortDateString());
-							//	cmd.ExecuteNonQuery();
-							//}
+							string Temp = str.Substring(9, 4);
+							string Humidity = str.Substring(23, 4);
+							string Light = Convert.ToInt32(str.Substring(34, 5)).ToString();
+							int NodeId = Convert.ToInt32(str.Substring(43, 2));
+							string dateTime = GetCurrentTime();
+							try{
+								if(connection.State != ConnectionState.Open)
+								{
+									connection.Open();
+								}
+								cmd = connection.CreateCommand();
+								cmd.CommandText = "INSERT INTO TB_INFO" + "(NODE_Id, S_ID, TEMP, Humidity, LIGHT, Time)VALUES(@NodeId, @SId, @Temp, @Humidity, @Light, @Time)";
+								cmd.Parameters.AddWithValue("@NodeId", NodeId);
+								cmd.Parameters.AddWithValue("@SId", HouseNumber);
+								cmd.Parameters.AddWithValue("@Temp", Temp);
+								cmd.Parameters.AddWithValue("@Humidity", Humidity);
+								cmd.Parameters.AddWithValue("@Light", Light);
+								cmd.Parameters.AddWithValue("@Time", dateTime);
+								//cmd.Parameters.AddWithValue("@Time", DateTime.Now.ToShortDateString());
+								cmd.ExecuteNonQuery();
+								for(int i = 0 ; i < userList[0].Count; i++)
+								{
+									User user = FindUserByUsername(userList[0], userList[0][i].username);
+									if(user != null)
+									{
+										user.socket.Send(Encoding.UTF8.GetBytes(str));
+									}
+								}
+							}
+							catch(MySQLException e){
+								MessageBox.Show("数据库异常：" + e.Message);
+							}
 						}
 						else
 						{
-							break;
+							continue;
 						}
 
-						byte[] arrMsg = Encoding.UTF8.GetBytes(str); //将要发送的字符串转换成Utf-8字节数组; 
-						foreach (Socket s in dicSocket.Values)
+						byte[] arrMsg = Encoding.UTF8.GetBytes("P" + str); //将要发送的字符串转换成Utf-8字节数组 
+						//收到大棚的数据以后给所有在线的发一下
+						for(int i = 0; i < lbOnline.CheckedItems.Count; i ++)
 						{
-							s.Send(arrMsg);
+							if(lbOnline.CheckedItems[i].Group.Name == "online")
+							{
+								User user = FindUserByUsername(userList[0] ,lbOnline.CheckedItems[i].SubItems[1].Text);
+								user.socket.Send(arrMsg);
+							}
 						}
-						// ShowMsg(strMsg);
-						txtMsg.Clear();
-						//MessageBox.Show("群发完毕！");
 					}
-					else if (str.Substring(0, 1) == "C")
+					else if (str.Substring(0, 1) == "c")
 					{
+						//wyc:我也不知道在干什么，就照着自己的想法改了改
 						//服务器接收到客户端发给它下传zigbee光照阈值的指令消息处理
 						//对应找相应系统的IP
-						byte[] arrMsg = Encoding.UTF8.GetBytes(str); //将要发送的字符串转换成Utf-8字节数组; 
-						foreach (Socket s in dicSocket.Values)
+						User user = FindUserByIP(userList[0] ,socketSend.RemoteEndPoint.ToString());
+						if(user != null)
 						{
-							s.Send(arrMsg);
+							byte[] arrMSg = buffer.Take(9).Concat(Encoding.UTF8.GetBytes(user.username)).ToArray(); //将要发送的字符串转换成Utf-8字节数组; 
+							foreach(User temp in userList[0])
+							{
+								if(user.username == temp.username)
+								{
+									continue;
+								}
+								temp.socket.Send(arrMSg);
+							}
 						}
-						// ShowMsg(strMsg);
-						txtMsg.Clear();
-						//MessageBox.Show("群发完毕！");
+					}
+					else if(str.Substring(0, 1) == "S")
+					{
+						if(connection.State != ConnectionState.Open)
+						{
+							connection.Open();
+						}
+						try
+						{
+							string selectSql = "Set @i:=0; select(@i:= @i + 1) as 'id', Node_id, S_ID, Temp, Humidity, Light, Time from TB_INFO where TIME LIKE '"+ str.Substring(1) + "%' ORDER BY Time;  ";
+							MySqlDataAdapter chaxun = new MySqlDataAdapter(selectSql, connection);
+							DataSet ds = new DataSet();
+							chaxun.Fill(ds, "table1");
+							string jsonData = JsonConvert.SerializeObject(ds.Tables[0]);
+							byte[] btSend = Encoding.UTF8.GetBytes("S" + jsonData);
+							User user = FindUserByIP(userList[0], currentKey);
+							user.socket.Send(btSend, 0, btSend.Length, SocketFlags.None);
+						}
+						catch(MySQLException e)
+						{
+							MessageBox.Show("异常" + e.Message);
+						}
 					}
 					else
 					{
-						break;
+						continue;
 					}
 				}
 				catch
 				{
-					string key = socketSend.RemoteEndPoint.ToString();
-					
-					//throw;
-					//从通信套接字集合中删除被中断连接的通信套接字
-					//dicSocket.Remove(socketSend.RemoteEndPoint.ToString());
-					//从通信线程集合中删除被中断连接的通信线程对象
-					//dicThread.Remove(socketSend.RemoteEndPoint.ToString());
-					//dicUsers.Remove(socketSend.RemoteEndPoint.ToString());
-					//从列表中删除被中断的IP
-					// lbOnline.Items.Remove(socketSend.RemoteEndPoint.ToString());
-					//ShowMsg("" + socketSend.RemoteEndPoint.ToString() + "断开异常消息\r\n" + se.Message);
-					ShowMsg(dicUsers[key] + "已经下线！");
-					HandleUserClose(socketSend.RemoteEndPoint.ToString());
-					break;
+					string ip = socketSend.RemoteEndPoint.ToString();
+					User user = FindUserByIP(userList[0], ip);
+					if(user != null)
+					{
+						userOffLine(user.username);
+
+					}
 				}
-
-			}
-
-			if (connection.State == ConnectionState.Open)
-			{
-				connection.Close();
+				if (connection.State == ConnectionState.Open)
+				{
+					connection.Close();
+				}
 			}
 		}
 		void ShowMsg(string str)
@@ -528,34 +473,7 @@ namespace _19server
 			Control.CheckForIllegalCrossThreadCalls = false;
 			//btnSend.PerformClick();
 		}
-		/// <summary>
-		/// 服务器给客户端发送消息
-		/// </summary>
-		/// <param name="sender"></param>
-		///// <param name="e"></param>
-		//private void btnSend_Click(object sender, EventArgs e)
-		//{
-		//    try
-		//    {
-		//        string str = txtMsg.Text;
 
-		//        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(str);
-		//        //思路一：再申请一个新数组，数组的长度是buffer.length+1 buffer[0]为0 表示文字 为1表示文件 为2表示震动
-		//        //思路二：申请集合 能把数组转到集合中 可以能让集合的元素转为数组
-		//        List<byte> list = new List<byte>();
-		//        // list.Add(0);
-		//        list.AddRange(buffer);
-		//        //将泛型集合转为数组
-		//        byte[] newBuffer = list.ToArray();
-		//        //获得用户在 下拉框中选中的ip地址
-		//string ip = cboUsers.SelectedItem.ToString();
-		//        string ip = "127.0.0.1";
-		//        dicSocket[ip].Send(newBuffer);
-		//    }
-		//    catch         ////////////////////////////////////////////////////////////////////////
-		//    { }
-		//    //socketSend.Send(buffer);
-		//}
 		/// <summary>
 		/// 选择要发送的文件
 		/// </summary>
@@ -583,7 +501,7 @@ namespace _19server
 			//得到文件路径和文件名
 			string path = txtPath.Text;
 			//检查是否选择了客户端
-			if(IsSelectUser())
+			if(lbOnline.CheckedItems.Count > 0)
 			{
 				if (path.Trim().Length == 0)
 				{
@@ -591,15 +509,23 @@ namespace _19server
 				}
 				else
 				{
-					//获得要发送文件的路径
-					using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+					string sendTime = GetCurrentTime();
+					for (int i = 0; i < lbOnline.CheckedItems.Count; i++)
 					{
-						if(sendFile(fs, cboUsers.SelectedItem.ToString()))
+						if (lbOnline.CheckedItems[i].Group.Name == "online")
 						{
-							ShowMsg("发送成功");
+							SendFile(path, lbOnline.CheckedItems[i].SubItems[1].Text, sendTime ,0);
+						}
+						else
+						{
+							SendFile(path, lbOnline.CheckedItems[i].SubItems[1].Text, sendTime, 1);
 						}
 					}
 				}
+			}
+			else
+			{
+				MessageBox.Show("请选择客户端");
 			}
 		}
 		/// <summary>
@@ -613,264 +539,315 @@ namespace _19server
 			{
 				byte[] buffer = new byte[1];
 				buffer[0] = 2;
-				dicSocket[cboUsers.SelectedItem.ToString()].Send(buffer);
+				if(lbOnline.CheckedItems.Count == 0)
+				{
+					MessageBox.Show("请选择客户端");
+				}
+				else
+				{
+					for(int i = 0; i < lbOnline.CheckedItems.Count; i++)
+					{
+						User user = FindUserByUsername(userList[0] ,lbOnline.CheckedItems[i].SubItems[1].Text);
+						if(user != null)
+						{
+							user.socket.Send(buffer);
+						}
+					}
+				}
 			}
 			catch
 			{ }
 		}
 
-		private void txtPort_TextChanged(object sender, EventArgs e)
-		{
-
-		}
-
-		private void textBox1_TextChanged(object sender, EventArgs e)
-		{
-
-		}
-
-		//private void txtMsg_TextChanged(object sender, EventArgs e)
-		//{
-		//    //try
-		//    //{
-		//    //while (txtMsg.Text!=string.Empty)
-		//    //{
-		//        string str = txtMsg.Text;
-
-		//        byte[] buffer = System.Text.Encoding.UTF8.GetBytes(str);
-		//        //思路一：再申请一个新数组，数组的长度是buffer.length+1 buffer[0]为0 表示文字 为1表示文件 为2表示震动
-		//        //思路二：申请集合 能把数组转到集合中 可以能让集合的元素转为数组
-		//        List<byte> list = new List<byte>();
-		//        // list.Add(0);
-		//        list.AddRange(buffer);
-		//        //将泛型集合转为数组
-		//        byte[] newBuffer = list.ToArray();
-		//        //获得用户在 下拉框中选中的ip地址
-		//        //  string ip = cboUsers.SelectedItem.ToString();
-
-		//        dicSocket[ip].Send(newBuffer);
-		//        //}
-		//        //catch
-		//        //{ }
-		//        ////socketSend.Send(buffer);
-		//       // txtMsg.Text = String.Empty;
-		//    //}
-		//}
-
+		//发消息
 		private void btnSend_Click(object sender, EventArgs e)
 		{
-
-			if (IsSelectUser())
+			//检查是否选择了客户端
+			if (lbOnline.CheckedItems.Count > 0 )
 			{
-				string strMsg = txtMsg.Text.Trim();
-				string strKey = cboUsers.Text;
-				if(strKey != "")
-				{
-					if (strMsg == "")
-					{
-						MessageBox.Show("发送的消息不能为空，请重新输入!");
-					}
-					else
-					{
-						byte[] arrMsg = Encoding.UTF8.GetBytes("msg" + GetCurrentTime() + strMsg);
-						dicSocket[strKey].Send(arrMsg);
-						txtMsg.Clear();
-						ShowMsg("向" + dicUsers[strKey] + "发送(" + GetCurrentTime() + "): " + strMsg);
-					}
-				}
-			}
-		}
-
-		private void cboUsers_SelectedIndexChanged(object sender, EventArgs e)
-		{
-
-		}
-
-		private void lbOnline_SelectedIndexChanged(object sender, EventArgs e)
-		{
-
-		}
-		//群发消息按钮的hover效果
-		private void BtnGroupSendMsg_MouseHover(object sender, EventArgs e)
-		{
-			// 创建the ToolTip 
-			ToolTip toolTip1 = new ToolTip();
-			// 设置显示样式
-			toolTip1.AutoPopDelay = 5000;//提示信息的可见时间
-			toolTip1.InitialDelay = 500;//事件触发多久后出现提示
-			toolTip1.ReshowDelay = 500;//指针从一个控件移向另一个控件时，经过多久才会显示下一个提示框
-			toolTip1.ShowAlways = true;//是否显示提示框
-									   //  设置伴随的对象.
-			toolTip1.SetToolTip(btnGroupSendMsg, "向所有在线的用户发送消息！");//设置提示按钮和提示内容
-		}
-
-		//群发消息按钮点击事件
-		private void BtnGroupSendMsg_Click(object sender, EventArgs e)
-		{
-			DialogResult result = MessageBox.Show("确定向当前在线的所有用户发送消息？", "提示", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-			//选择是
-			if (result == DialogResult.Yes)
-			{
-				string strMsg = txtMsg.Text.Trim();
-				if (strMsg == "")
+				if (txtMsg.Text.Trim() == "")
 				{
 					MessageBox.Show("发送的消息不能为空，请重新输入!");
 				}
 				else
 				{
-					GroupSend("msg" + GetCurrentTime() + strMsg);
-				}				
-			}
-			//选择否
-			else
-			{
-				return;
-			}
-		}
-		//群发消息
-		private void GroupSend(string str)
-		{
-			byte[] arrMsg = Encoding.UTF8.GetBytes(str); //将要发送的字符串转换成Utf-8字节数组; 
-			if(dicSocket.Count == 0)
-			{
-				MessageBox.Show("当前没有用户在线！");
-			}
-			else
-			{
-				foreach (string key in dicSocket.Keys)
-				{
-					dicSocket[key].Send(arrMsg);
-					ShowMsg("向" + dicUsers[key] + "发送(" + GetCurrentTime() + "): " + str.Substring(22));
+					string msg = txtMsg.Text.Trim();					
+					SendMsg();
+					txtMsg.Clear();
 				}
-				txtMsg.Clear();
+			}
+			else
+			{
+				MessageBox.Show("请选择客户端");
 			}
 		}
-		
+		private void CheckOfflineMessage(string username)
+		{
+			using (MySqlConnection connection = new MySqlConnection(MyConnectionString))
+			{
+				try
+				{
+					connection.Open();//连接数据库
+					MySqlCommand cmd = connection.CreateCommand();
+					cmd.CommandText = "SELECT * FROM TB_OFFLINE_MESSAGE WHERE USER_NAME = '" + username + "'  ORDER BY SEND_TIME";
+					MySqlDataReader reader = cmd.ExecuteReader();
+					while (reader.Read())
+					{
+						string strMsg = reader["offline_message"].ToString();		//用户编辑的消息
+						string sendTime = reader["send_time"].ToString();			//用户发送的时间
+						byte[] sendMsg = buildSendMsg(strMsg, sendTime);
+						User user = FindUserByUsername(userList[0], username); 
+						user.socket.Send(sendMsg);
+					}
+					reader.Close();
+					reader.Dispose();
+					cmd.CommandText = "DELETE FROM TB_OFFLINE_MESSAGE WHERE USER_NAME = '" + username + "';";
+					cmd.ExecuteNonQuery();
+				}
+				catch (MySQLException e)
+				{
+					MessageBox.Show("异常：" + e.Message);
+				}
+			}
+		}
+		byte[] buildSendMsg(string strMsg, string sendTime)
+		{
+			byte[] arrMsg = Encoding.UTF8.GetBytes(sendTime + strMsg);		//消息和时间
+			byte[] msgLength = BitConverter.GetBytes(arrMsg.Length);		//消息的长度
+			byte[] flagByte = new byte[1];									//标志位
+			flagByte[0] = 0x6D;			//"m"
+			byte[] sendMsg = new byte[5 + arrMsg.Length];				//最终发给我客户端的msg					
+			sendMsg = flagByte.Concat(msgLength).Concat(arrMsg).ToArray();	//标志位 + 长度 + 时间 + 消息
+			return sendMsg;
+		}
+		//发送消息
+		private void SendMsg()
+		{
+			string msg = txtMsg.Text.Trim();			//消息
+			string sendTime = GetCurrentTime();		//发送时间
+			byte[] arrMsg = buildSendMsg(msg, sendTime);
+			for (int i = 0; i < lbOnline.CheckedItems.Count; i++)
+			{
+				//在线
+				if(lbOnline.CheckedItems[i].Group.Name == "online")
+				{
+					User user = FindUserByUsername(userList[0], lbOnline.CheckedItems[i].SubItems[1].Text);
+					user.socket.Send(arrMsg);
+					ShowMsg("向" + user.username + "发送(" + sendTime + "): " + msg);
+				}
+				//离线
+				else
+				{
+					using (MySqlConnection connection = new MySqlConnection(MyConnectionString))
+					{
+						try
+						{
+							//离线消息存到数据库里面，等客户登录的时候再给客户发过去
+							connection.Open();//连接数据库
+							MySqlCommand cmd = connection.CreateCommand();
+							string username = lbOnline.CheckedItems[i].SubItems[1].Text;
+							cmd.CommandText = "INSERT INTO TB_OFFLINE_MESSAGE(USER_NAME, OFFLINE_MESSAGE, SEND_TIME)VALUES(@username, @offlineMessage, @sendTime);";
+							cmd.Parameters.AddWithValue("@username", username);
+							cmd.Parameters.AddWithValue("@offlineMessage", msg);
+							cmd.Parameters.AddWithValue("@sendTime", sendTime);
+							cmd.ExecuteNonQuery();
+						}
+						catch (MySQLException e)
+						{
+							MessageBox.Show("异常：" + e.Message);
+						}
+					}			
+				}
+			}
+		}		
 		//获取当前的时间
 		private string GetCurrentTime()
 		{
 			return DateTime.Now.ToString("yyyy/MM/dd hh:mm:ss");
 		}
-
-		//检查是否选择了客户端
-		private bool IsSelectUser()
-		{
-			if (cboUsers.Text == "请选择客户端")
-			{
-				MessageBox.Show("请选择客户端");
-				return false;
-			}
-			return true;
-		}
-
 		//发送文件
-		private bool sendFile(FileStream fs, string ip)
+		private bool SendFile(string path, string username, string sendTime, int state)
 		{
-			string path = txtPath.Text;
-			try
+			using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
 			{
-				string fileName = path.Substring(path.LastIndexOf("\\"), path.Length - path.LastIndexOf("\\"));
-				ShowMsg(GetCurrentTime() + " 向" + dicUsers[ip] + "发送文件:" + fileName);
-				byte[] fileBuffer = new byte[fs.Length];
-				fs.Read(fileBuffer, 0, fileBuffer.Length);
-				byte[] btFileName = Encoding.UTF8.GetBytes(fileName);
-				//发送的内容为 "f" + 文件名长度 + 文件 + 文件名
-				byte[] sendBuffer = new byte[5 + btFileName.Length + fileBuffer.Length];
-				sendBuffer[0] = 0x66;           //发送文件的标记	"f"
-				byte[] btFileNameLength = new byte[4];
-				btFileNameLength = BitConverter.GetBytes(btFileName.Length);
-				Buffer.BlockCopy(btFileNameLength, 0, sendBuffer, 1, 4);    //文件名长度写进send
-				Buffer.BlockCopy(fileBuffer, 0, sendBuffer, 5, fileBuffer.Length);  //文件写进send
-				Buffer.BlockCopy(btFileName, 0, sendBuffer, 5 + fileBuffer.Length, btFileName.Length);  //文件名写进send
-				fs.Close();
-				//向选择的客户端发送文件
-				dicSocket[ip].Send(sendBuffer, 0, sendBuffer.Length, SocketFlags.None);
-				return true;
-			}
-			catch
-			{
-				MessageBox.Show("文件发送失败，请联系管理员解决！");
-				return false;
-
-			}
-		}
-		//根据用户名查找IP地址，找到了是key，没找到就是""
-		private string getKeyByUsername(string name)
-		{
-			foreach (string key in dicUsers.Keys)
-			{
-				//说明该用户已经上线
-				if (dicUsers[key] == name)
+				try
 				{
-					return key;
-				}
-			}
-			return "";
-		}
-		//用户下线处理
-		private void HandleUserClose(string delKey)
-		{
-			if(delKey != "")
-			{
-				if(cboUsers.Text == dicUsers[delKey])
-				{
-					cboUsers.Text = "请选择客户端";
-				}
-				//移除下拉框
-				cboUsers.Items.Remove(delKey);
-				//移除listviw中的东西
-				//for (int i = 0; i < lbOnline.Items[0].SubItemsCount; i++)
-				//{
-
-				//	if (lbOnline.Items[0].SubItems[i].Text == dicUsers[delKey])
-				//	{
-				//		//移除listview中的一行
-				//		lbOnline.Items[0].SubItems.RemoveAt(i);
-				//	}
-				//}
-				//移除用户dic，socketdic，线程dic
-				dicUsers.Remove(delKey);
-				dicSocket.Remove(delKey);
-				dicThread.Remove(delKey);
-			}
-		}
-		//群发文件
-		private void BtnGroupSendFile_Click(object sender, EventArgs e)
-		{
-			if (dicSocket.Count == 0)
-			{
-				MessageBox.Show("当前没有用户在线！");
-			}
-			else
-			{
-				string path = txtPath.Text;
-				if (path.Trim().Length == 0)
-				{
-					MessageBox.Show("请选择需要发送的文件！");
-				}
-				else{
-					using (FileStream fs = new FileStream(path, FileMode.Open, FileAccess.Read))
+					//根据path获取到文件名
+					string fileName = path.Substring(path.LastIndexOf("\\"), path.Length - path.LastIndexOf("\\"));
+					//最大文件大小10M	100表示的是文件名和时间等杂项
+					if(fs.Length > 10 * 1024 * 1024 - 100)
 					{
-						int flag = 1;
-						foreach (string key in dicSocket.Keys)
+						MessageBox.Show("所选文件不能超过10M！");
+						return false;
+					}
+					byte[] fileBuffer = new byte[fs.Length];			//文件字节流
+					fs.Read(fileBuffer, 0, fileBuffer.Length);			//读文件
+					byte[] btFileName = Encoding.UTF8.GetBytes(fileName);			//文件名字节流
+					byte[] btFileTimeLength = new byte[4];
+					byte[] btTime = Encoding.UTF8.GetBytes(sendTime);
+					btFileTimeLength = BitConverter.GetBytes(btFileName.Length + btTime.Length);
+					byte[] flagByte = new byte[1];									//标志位
+					flagByte[0] = 0x66;									//发送文件的标记	"f"
+					byte[] btFileLength = BitConverter.GetBytes(4 + btTime.Length +  btFileName.Length + fileBuffer.Length);
+					//发送的内容为 "f" + 文件和文件名和时间总长度 +文件名和时间长度 + 时间 + 文件名 + 文件
+					byte[] sendBuffer = new byte[1 + 4 + 4 + btTime.Length + btFileName.Length + fileBuffer.Length];
+					sendBuffer = flagByte.Concat(btFileLength).Concat(btFileTimeLength).Concat(btTime).Concat(btFileName).Concat(fileBuffer).ToArray();
+					
+					//在线发送
+					if(state == 0)
+					{
+						User user = FindUserByUsername(userList[state], username);
+						//向客户端发送文件
+						if (user != null)
 						{
-							if(!sendFile(fs, key))
+							user.socket.Send(sendBuffer, 0, sendBuffer.Length, SocketFlags.None);
+							ShowMsg(sendTime + " 向" + user.username + "发送文件:" + fileName);
+							fs.Close();
+							//等待来自客户端的回应，是否发送成功
+							byte[] result = new byte[20];
+							int len = user.socket.Receive(result);
+							if(Encoding.UTF8.GetString(result) == "FileDone")
 							{
-								flag = 0;
+								ShowMsg("发送成功");
+								return true;
 							}
-						}
-						if(flag == 1)
-						{
-							ShowMsg("发送成功！");
+							else
+							{
+								MessageBox.Show("文件发送失败，请联系管理员解决！");
+								return false;
+							}
 						}
 						else
 						{
-							MessageBox.Show("发送失败！");
+							MessageBox.Show("文件发送失败，请联系管理员解决！");
+							return false;
+						}
+					}
+					//离线发送
+					else
+					{
+						using (MySqlConnection connection = new MySqlConnection(MyConnectionString))
+						{
+							try
+							{
+								//离线消息存到数据库里面，等客户登录的时候再给客户发过去
+								connection.Open();//连接数据库
+								MySqlCommand cmd = connection.CreateCommand();
+								cmd.CommandText = "INSERT INTO TB_OFFLINE_FILE(USER_NAME, OFFLINE_FILEPATH, SEND_TIME)VALUES(@username, @offlineFilepath, @sendTime);";
+								cmd.Parameters.AddWithValue("@username", username);
+								cmd.Parameters.AddWithValue("@offlineFilepath", path);
+								cmd.Parameters.AddWithValue("@sendTime", sendTime);
+								if(cmd.ExecuteNonQuery() > 0)
+								{
+									return true;
+								}
+								else
+								{
+									return false;
+								}
+							}
+							catch (MySQLException e)
+							{
+								MessageBox.Show("异常：" + e.Message);
+								return false;
+							}
 						}
 					}
 				}
-				
+				catch
+				{
+					MessageBox.Show("文件发送失败，请联系管理员解决！");
+					return false;
+				}
 			}
+		}
+		private void CheckOfflineFile(string username)
+		{
+			using (MySqlConnection connection = new MySqlConnection(MyConnectionString))
+			{
+				try
+				{
+					connection.Open();//连接数据库
+					MySqlCommand cmd = connection.CreateCommand();
+					cmd.CommandText = "SELECT * FROM TB_OFFLINE_FILE WHERE USER_NAME = '" + username + "'  ORDER BY SEND_TIME";
+					MySqlDataReader reader = cmd.ExecuteReader();
+					string delIds = "";
+					while (reader.Read())
+					{
+						string path = reader["offline_filepath"].ToString();		//用户编辑的消息
+						string sendTime = reader["send_time"].ToString();			//用户发送的时间
+						if(SendFile(path, username, sendTime, 0))
+						{
+							delIds += reader["id"].ToString() + "-";
+						}
+					}
+					reader.Close();
+					string[] arrayIds = delIds.Split('-');
+					cmd.CommandText = "DELETE FROM TB_OFFLINE_FILE WHERE ";
+					for(int i = 0; i < arrayIds.Length; i ++)
+					{
+						if (i == 0)
+						{
+							cmd.CommandText += "ID = '" + arrayIds[i] + "'";
+						}
+						else
+						{
+							cmd.CommandText += "OR ID = '" + arrayIds[i] + "'";
+						}
+					}
+					cmd.ExecuteNonQuery();
+					if(connection.State == ConnectionState.Open)
+					{
+						connection.Close();
+					}
+				}
+				catch (MySQLException e)
+				{
+					MessageBox.Show("异常：" + e.Message);
+				}
+			}
+		}
+		private void ipPort_KeyPress(object sender, KeyPressEventArgs e)
+		{
+			if (e.KeyChar == 13)
+			{
+				this.btnStart.Focus();
+				this.btnStart.PerformClick();
+			}
+		}
+		
+		private User FindUserByUsername(List<User> list, string name)
+		{
+			foreach(User user in list)
+			{
+				if (user.username == name)
+				{
+					return user;
+				}
+			}
+			return null;
+		}
+		private int FindUserIndexByUserName(List<User> list, string name)
+		{
+			for(int i = 0 ; i < list.Count; i++)
+			{
+				if(list[i].username == name)
+				{
+					return i;
+				}
+			}
+			return -1;
+		}
+		private User FindUserByIP(List<User> list, string ip)
+		{
+			foreach(User user in list)
+			{
+				if(user.socket.RemoteEndPoint.ToString() == ip)
+				{
+					return user;
+				}
+			}
+			return null;
 		}
 	}
 }

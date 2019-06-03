@@ -38,10 +38,6 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>D:\应用软件\mysql\MySql.Data.dll</HintPath>
     </Reference>
-    <Reference Include="MySql.Web, Version=6.9.7.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>D:\应用软件\mysql\MySql.Web.dll</HintPath>
-    </Reference>
     <Reference Include="MySQLDriverCS">
       <HintPath>D:\Program Files\mysqlDiver\MySQLDriverCS\dll\MySQLDriverCS.dll</HintPath>
     </Reference>
@@ -71,7 +67,6 @@
     <Compile Include="User.cs" />
     <EmbeddedResource Include="Form1.resx">
       <DependentUpon>Form1.cs</DependentUpon>
-      <Link>Form1.resx</Link>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
@@ -81,6 +76,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
@@ -98,6 +94,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Resources\%24this.BackgroundImage.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\server.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\server1.jpg" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

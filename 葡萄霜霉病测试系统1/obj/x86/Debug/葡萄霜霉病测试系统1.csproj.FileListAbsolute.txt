@@ -37,10 +37,10 @@ I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\
 I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.exe
 I:\毕业论文\CSharp_project\success4\Server\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.pdb
 E:\project\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.exe
-E:\project\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.pdb
-E:\project\葡萄霜霉病测试系统1\bin\Debug\byn-ER\葡萄霜霉病测试系统1.resources.dll
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.pdb
 E:\project\葡萄霜霉病测试系统1\bin\Debug\Newtonsoft.Json.dll
 E:\project\葡萄霜霉病测试系统1\bin\Debug\Newtonsoft.Json.xml
+E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csprojAssemblyReference.cache
 E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.Register.resources
 E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病防控测试系统1.Login.resources
 E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.Properties.Resources.resources
@@ -51,5 +51,5 @@ E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系�
 E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\byn-ER\葡萄霜霉病测试系统1.resources.dll
 E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csproj.CopyComplete
 E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.exe
-E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.pdb
-E:\project\葡萄霜霉病测试系统1\obj\x86\Debug\葡萄霜霉病测试系统1.csprojAssemblyReference.cache
+E:\project\葡萄霜霉病测试系统1\bin\Debug\葡萄霜霉病测试系统1.pdb
+E:\project\葡萄霜霉病测试系统1\bin\Debug\byn-ER\葡萄霜霉病测试系统1.resources.dll

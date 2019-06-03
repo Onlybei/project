@@ -12,9 +12,17 @@ namespace ClientUser
 		public string trueName = "";
 		public string telephone = "";
 		public string company = "";
-		public string state = "offline";
 
-		public User(string username, Socket socket, Thread thread, string trueName, string telephone, string company, string state)
+		public User()
+		{
+			this.username = "";
+			this.socket = null;
+			this.thread = null;
+			this.trueName = "";
+			this.telephone = "";
+			this.company = "";
+		}
+		public User(string username, Socket socket, Thread thread, string trueName, string telephone, string company)
 		{
 			this.username = username;
 			this.socket = socket;
@@ -22,7 +30,6 @@ namespace ClientUser
 			this.trueName = trueName;
 			this.telephone = telephone;
 			this.company = company;
-			this.state = state;
 		}
 	}
 }
